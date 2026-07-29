@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль {{.Name}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .profile-header {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .profile-header h1 {
+            margin: 0 0 8px 0;
+            color: #007BFF;
+        }
+        .login {
+            color: #555;
+            font-size: 17px;
+            margin-bottom: 15px;
+        }
+
+        /* Кнопки в профиле */
+        .profile-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .add-button, .messenger-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .add-button:hover {
+            background: #218838;
+        }
+
+        .messenger-button {
+            background: #007BFF;
+        }
+
+        .messenger-button:hover {
+            background: #0056b3;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #333;
+        }
+
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 250px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #007BFF;
+        }
+        .card p {
+            margin: 5px 0;
+            color: #333;
+        }
+        .owner {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .no-announcements {
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+            margin-top: 40px;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .back a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .back a:hover {
+            text-decoration: underline;
+        }
+
+        .load-more-container {
+            text-align: center;
+            margin: 40px 0 20px;
+        }
+
+        .load-more-btn {
+            padding: 12px 32px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .load-more-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 123, 255, 0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-bar input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+        .search-bar button {
+            padding: 8px 12px;
+            border: none;
+            background: #007BFF;
+            color: #fff;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background: #0056b3;
+        }
+        .avatar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .avatar-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            display: none;
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        }
+        #icon {
+            font-size: 60px;
+            color: #777;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="/static/header.css">
+</head>
+<body>
+    {{template "header"}}
+
+    <div class="main-content">
+        <div class="profile-header">
+            <div class="avatar-container">
+                <img id="avatar-profile" src="" alt="Аватар" class="avatar-img">
+                <span id="icon-profile">👤</span>
+            </div>
+            <h1>{{.Name}}</h1>
+            <div class="login">@{{.Login}}</div>
+            
+            {{if eq .Login "my"}}
+                <div class="profile-buttons">
+                    <a href="/announcements/create" class="add-button">+ Добавить новое объявление</a>
+                    <a href="/messenger" class="messenger-button">💬 Мессенджер</a>
+                </div>
+            {{end}}
+        </div>
+
+        <h2 class="section-title">Объявления</h2>
+
+        <form class="search-bar" id="searchForm" action="/profile" method="GET">
+            <input type="text" name="search" id="searchInput" placeholder="Поиск объявлений..." value="{{.SearchString}}">
+            <button type="submit">Найти</button>
+        </form>
+
+        <script>
+            const form = document.getElementById("searchForm");
+            form.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const query = document.getElementById("searchInput").value;
+                const url = form.action + "?search=" + encodeURIComponent(query) + "&login={{.Login}}";
+                window.location.href = url;
+            });
+        </script>
+
+        <div class="cards" id="cardsContainer">
+            {{range .Announcements}}
+                <a href="{{.LinkToAnnouncement}}" class="card">
+                    {{if .Images}}
+                        <img src="{{index .Images 0}}" alt="Изображение объявления" class="card-img">
+                    {{else}}
+                        <div class="card-img placeholder"></div>
+                    {{end}}
+                    <div class="owner">{{.AuthorName}}</div>
+                    <h3>{{.Title}}</h3>
+                    <p>{{.Description}}</p>
+
+                    {{if eq $.Login "my"}}
+                        <form action="/announcements/delete?id={{.AnnouncementID}}" method="POST" style="margin-top:10px;">
+                            <!-- <input type="hidden" name="announcementID" value="{{.AnnouncementID}}"> -->
+                            <button type="submit" class="delete-btn">Удалить</button>
+                        </form>
+                    {{end}}
+                </a>
+            {{else}}
+                <div class="no-announcements">
+                    Пока нет объявлений
+                </div>
+            {{end}}
+        </div>
+
+        <div class="load-more-container">
+            <button id="loadMore" class="load-more-btn">
+                Загрузить ещё
+            </button>
+        </div>
+        
+        <div class="back">
+            <a href="#" onclick="history.back(); return false;">← Вернуться к предыдущей странице</a>
+        </div>
+    </div>
+
+    <script>
+        let offset = 0;
+        const loadBtn = document.getElementById("loadMore");
+        const container = document.getElementById("cardsContainer");
+
+        if (loadBtn) {
+            loadBtn.addEventListener("click", async () => {
+                loadBtn.classList.add("loading");
+                loadBtn.disabled = true;
+
+                offset++;
+                const searchValue = document.getElementById("searchInput").value.trim();
+                let url = `/search?offset=${offset}&authorid={{.ID}}`;
+
+                if (searchValue) {
+                    url += `&search=${encodeURIComponent(searchValue)}`;
+                }
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                loadBtn.classList.remove("loading");
+                loadBtn.disabled = false;
+
+                if (data.length === 0) {
+                    loadBtn.style.display = "none";
+                    return;
+                }
+
+                data.forEach(ad => {
+                    const card = document.createElement("a");
+                    card.href = ad.LinkToAnnouncement;
+                    card.className = "card";
+                    card.innerHTML = `
+                        <div class="owner">${ad.AuthorName}</div>
+                        <h3>${ad.Title}</h3>
+                        <p>${ad.Description}</p>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

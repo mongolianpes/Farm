@@ -1,0 +1,137 @@
+.inner{
+    background-color: #48b2b0;
+    text-align: center;
+    border-color:#48b2b0;
+    border-radius: 30px;
+    margin-bottom: 5%;
+    padding:5%;
+    color: #ffffff;
+    font-family: "Rubik Mono One" ;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.inner:hover{
+    background-color: #398f94;
+    transition:0.3s ;
+    box-shadow: 5px 5px 15px rgba(255, 255, 184, 0.5);
+}
+.navbar-nav {
+    background-color: beige;
+    border-radius: 10px;
+    font-family: monospace;
+    text-align: center;
+}
+
+.navbar-nav:hover > :not(:hover){
+    filter:blur(0.1px);
+    opacity:0.5;
+    transition: 0.3s;
+}
+
+.logo{
+    filter: grayscale(0%)
+}
+
+.logo:hover{
+    filter: grayscale(100%)
+}
+
+.rubik-mono-one-regular {
+    font-family: "Rubik Mono One", serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+.container {
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+
+
+.container-card {
+    margin: 5%;
+}
+
+.card-body{
+    margin-bottom: 5%;
+    justify-content: center;
+}
+
+
+.btn-primary{
+    background-color: #48b2b0;
+    border-color:#48b2b0;
+    border-radius: 30px;
+    padding:5%;
+    font-family: "Rubik Mono One", serif;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.btn-primary:hover{
+    background-color: black;
+    box-shadow: 5px 5px 15px rgba(78, 255, 231, 0.5);
+}
+
+a{
+    color: #ffffff; !important
+    font-family: "Rubik Mono One" ;!important
+}     
+
+
+
+.otrava{
+    font-size: 30px;
+    font-weight: 40px;
+    color: #398f94;
+}
+
+.pupok {
+    padding-top: 10%;
+    padding-bottom: 10%;
+    background: 
+        url('banner.PNG') no-repeat center/cover,
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+    }
+
+.pupok:hover {
+    transition: 2s;
+    background: 
+        url('banner-hover.PNG') no-repeat center/1500px,
+        url('banner.PNG') no-repeat center/cover,
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+    mix-blend-mode: multiply;
+    transition: 2s;
+}
+
+.content-text{
+    font-family: bauhaus_lt ;
+
+}
+
+.otrava{
+    font-family: Appetite;
+}
+
+@font-face {
+    font-family: "bauhaus_lt";
+    src: url(bauhas_lt\(RUS\ BY\ LYAJKA\).ttf) format("truetype");
+}
+p.customfont { 
+    font-family: "bauhaus_lt", Verdana, Tahoma;
+}
+
+@font-face {
+    font-family: "Appetite";
+    src: url(Appetite.ttf) format("truetype");
+}
+p.customfont { 
+    font-family: "Appetite", Verdana, Tahoma;
+}
+
+.container-meow{
+    text-align: center;
+    max-width: 400px;
+}
+
+
+

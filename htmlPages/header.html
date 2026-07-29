@@ -1,0 +1,73 @@
+{{define "header"}}
+<header>
+    <div class="header-container">
+        <a href="/" class="logo">Project-Farm</a>
+        
+        <nav>
+            <ul>
+                <li><a href="/">Главная</a></li>
+                <li><a href="/announcements">Объявления</a></li>
+            </ul>
+        </nav>
+
+        <a href="/profile" class="profile-link">
+            <img id="avatar" src="" alt="Аватар" style="width:32px;height:32px;border-radius:50%;margin-right:6px;display:none;">
+            <span id="icon">👤</span>
+            <span id="username"></span>
+        </a>
+    </div>
+</header>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function() {
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+            return "";
+        }
+
+        async function ensureCookies() {
+            const username = getCookie("username");
+            const avatarPath = getCookie("useravatar");
+
+            if (!username || !avatarPath) {
+                try {
+                    // запрос на сервер для получения недостающих cookies
+                    const res = await fetch("/get-header-cookie", { credentials: "include" });
+                } catch (err) {
+                    console.error("Ошибка при получении cookies:", err);
+                }
+            }
+        }
+
+        await ensureCookies();
+
+        const username = getCookie("username");
+        const avatarPath = getCookie("useravatar");
+
+        document.getElementById("username").textContent = username ? username : "Гость";
+
+        const avatarImg = document.getElementById("avatar");
+        const avatarProfileImg = document.getElementById("avatar-profile")
+        const iconProfile = document.getElementById("icon-profile")
+        const iconSpan = document.getElementById("icon");
+
+        if (avatarPath) {
+            avatarImg.src = avatarPath;
+            avatarImg.style.display = "inline-block";
+            iconSpan.style.display = "none"; // скрываем 👤 если есть аватар
+            avatarProfileImg.src = avatarPath;
+            avatarProfileImg.style.display = "inline-block";
+            iconProfile.style.display = "none"
+        } else {
+            avatarImg.style.display = "none";
+            iconSpan.style.display = "inline-block"; // показываем 👤 если аватара нет
+            avatarProfileImg.style.display = "none";
+            iconProfile.style.display = "inline-block"
+        }
+    });
+</script>
+{{end}}

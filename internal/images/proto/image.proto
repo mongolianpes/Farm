@@ -1,0 +1,24 @@
+syntax = "proto3";
+package main;
+option go_package = "F://Канал//Контент//Статьи и видео//Статья Хабр//image-converter";
+
+message DownloadImagesRequest {
+ImageInfo info = 1; //параметры обработки изображения
+bytes image = 2; // непосредственно данные изображения
+}
+
+message ImageInfo {
+string compress = 1; // сжатие
+string watermark = 2; // вотермарк
+string format = 3; // перевод в формат файла
+repeated int32 width = 4; // ширина обработанной картинки
+repeated int32 height = 5; // высота обработанной картинки
+}
+message DownloadImagesResponse {
+repeated string storage_path = 1; // ссылка куда сохранить
+string error=2;
+}
+
+service ImageService {
+rpc DownloadImages(stream DownloadImagesRequest) returns (DownloadImagesResponse);
+}

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мессенджер</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .main-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 10px;
+            box-sizing: border-box;
+            gap: 12px;
+        }
+
+        /* Стили списка чатов */
+        .chat-list { 
+            width: 100%; 
+            max-width: 900px; 
+            /* flex: 1; */   /* закомментировать или убрать */
+            overflow-y: auto; 
+            padding: 10px; 
+            max-height: 70vh;   /* ограничить высоту */
+        } 
+        .chat-item { display: flex; align-items: center; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .chat-item:hover { background: #f0f8ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .chat-item img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
+        .chat-info { flex: 1; }
+        .chat-info .name { font-weight: bold; font-size: 17px; margin-bottom: 3px; }
+        .chat-info .last-msg { color: #666; font-size: 14px; }
+
+        /* Стили текущего чата */
+        .chat-header { display: flex; align-items: center; gap: 12px; background: #fff; padding: 12px 18px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); width: 100%; max-width: 900px; flex-shrink: 0; }
+        .chat-header img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .chat-header .username { font-size: 17px; font-weight: bold; color: #333; }
+
+        .chat-container { 
+            width: 100%; 
+            max-width: 900px; 
+            height: 55vh; 
+            background: #fff; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+
+        .messages { 
+            flex: 1; 
+            padding: 18px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+
+        .message { max-width: 70%; padding: 10px 14px; border-radius: 12px; line-height: 1.4; }
+        .message.sent { background: #007BFF; color: #fff; margin-left: auto; text-align: right; }
+        .message.received { background: #e0e0e0; color: #333; margin-right: auto; text-align: left; }
+
+        .input-area { display: flex; border-top: 1px solid #ddd; flex-shrink: 0; }
+        .input-area input { flex: 1; padding: 14px 16px; border: none; outline: none; font-size: 16px; }
+        .input-area button { padding: 0 24px; background: #007BFF; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+        .input-area button:hover { background: #0056b3; }
+        
+        .actions { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            width: 100%; 
+            max-width: 900px; 
+            flex-shrink: 0;
+            margin-top: 10px;      /* ← добавили */
+        }   
+        .back-link, .chat-button { padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 15px; flex: 1; max-width: 230px; text-align: center; }
+        .back-link { border: 1px solid #007BFF; color: #007BFF; }
+        .back-link:hover { background: #007BFF; color: #fff; }
+        .chat-button { background: #007BFF; color: #fff; }
+        .chat-button:hover { background: #0056b3; }
+        .timestamp { display: block; font-size: 12px; color: #777; margin-top: 4px; }
+
+        .load-more-messages {
+            text-align: center;
+            padding: 8px;
+        }
+
+        .load-more-btn {
+            padding: 8px 24px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .load-more-btn:hover { background: #0056b3; }
+        .no-chats { text-align: center; color: #777; font-size: 18px; margin-top: 50px; }
+    </style>
+    <link rel="stylesheet" href="/static/header.css">
+</head>
+<body>
+    {{template "header"}}
+    <div class="main-content">
+
+        {{if .Name}}
+            <!-- ОДИН ЧАТ -->
+            <div class="chat-header">
+                <img src="{{.PartnerAvatar}}" alt="Аватар">
+                <div class="username">{{.Name}}</div>
+            </div>
+
+            <div class="chat-container">
+                <div class="messages" id="messagesContainer"></div>
+               
+                <div class="input-area">
+                    <input type="text" id="messageInput" placeholder="Введите сообщение...">
+                    <button id="sendButton">Отправить</button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="#" onclick="history.back(); return false;" class="back-link">← Вернуться</a>
+                <a href="/announcements" class="chat-button">📋 К объявлениям</a>
+            </div>
+        {{else}}
+            <!-- СПИСОК ЧАТОВ -->
+            <h2 style="margin: 10px 0 20px;">Мои чаты</h2>
+            <div class="chat-list">
+                {{range .Partners}}
+                    <a href="/messenger?partnerid={{.ID}}" class="chat-item">
+                        <img src="{{.AvatarPath}}" alt="Аватар">
+                        <div class="chat-info">
+                            <div class="name">{{.Name}}</div>
+                            <div class="last-msg">Напишите сообщение...</div>
+                        </div>
+                    </a>
+                {{else}}
+                    <div class="no-chats">У вас пока нет чатов</div>
+                {{end}}
+            </div>
+
+            <div class="actions" style="margin-top: 8px;">
+                <a href="/announcements" class="chat-button">📋 К объявлениям</a>
+            </div>
+        {{end}}
+
+    </div>
+
+    {{if .Name}}
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.getElementById("messageInput");
+            const sendBtn = document.getElementById("sendButton");
+            const messagesContainer = document.getElementById("messagesContainer");
+
+            let partnerID = "{{.PartnerID}}";
+            let isLoading = false;
+            let lastTimestamp = null;
+            const seenTimestamps = new Set();
+            let loadMoreOffset = 1;        // Будем начинать с 0 и увеличивать
+            let loadMoreButton = null;
+
+            if (!partnerID) {
+                messagesContainer.innerHTML = `<div style="color:red; text-align:center;">Ошибка: partnerID не найден</div>`;
+                return;
+            }
+
+            function formatTime(isoString) {
+                return new Date(isoString).toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', minute: '2-digit' 
+                });
+            }
+
+            function createMessageElement(msg) {
+                const div = document.createElement("div");
+                div.className = msg.MyMessage ? "message sent" : "message received";
+                div.innerHTML = `${msg.Text}<span class="timestamp">${formatTime(msg.CreateAt)}</span>`;
+                return div;
+            }
+
+            // Создаём кнопку один раз
+            function createLoadMoreButton() {
+                if (loadMoreButton) return;
+
+                const div = document.createElement('div');
+                div.className = 'load-more-messages';
+                div.innerHTML = `<button class="load-more-btn">Загрузить ещё</button>`;
+
+                messagesContainer.prepend(div);
+
+                div.querySelector('button').addEventListener("click", loadOlderMessages);
+
+                loadMoreButton = div;
+            }
+
+            // === ЗАГРУЗКА НОВЫХ/АКТУАЛЬНЫХ СООБЩЕНИЙ ===
+            async function loadInitialMessages() {
+                if (isLoading) return;
+                isLoading = true;
+
+                try {
+                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=0`);
+                    if (!response.ok) throw new Error("Ошибка сервера");
+
+                    let messages = await response.json();
+                    if (messages.length === 0) return;
+
+                    messages.sort((a, b) => new Date(a.CreateAt) - new Date(b.CreateAt));
+
+                    // Очищаем контейнер перед первой загрузкой
+                    messagesContainer.innerHTML = '';
+                    createLoadMoreButton(); // кнопка сверху
+
+                    messages.forEach(msg => {
+                        if (seenTimestamps.has(msg.CreateAt)) return;
+                        seenTimestamps.add(msg.CreateAt);
+
+                        const msgElement = createMessageElement(msg);
+                        messagesContainer.appendChild(msgElement);
+                    });
+
+                    if (messages.length > 0) {
+                        lastTimestamp = messages[messages.length - 1].CreateAt;
+                    }
+
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                } catch (err) {
+                    console.error("Ошибка загрузки сообщений:", err);
+                } finally {
+                    isLoading = false;
+                }
+            }
+
+            async function loadOlderMessages() {
+                if (isLoading) return;
+                isLoading = true;
+
+                console.log('🔄 Загрузка старых сообщений, offset:', loadMoreOffset);
+
+                const buttonContainer = loadMoreButton;
+                const button = buttonContainer ? buttonContainer.querySelector('button') : null;
+
+                try {
+                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=${loadMoreOffset}`);
+                    if (!response.ok) throw new Error("Ошибка сервера");
+
+                    let messages = await response.json();
+                    
+                    console.log(`📥 Получено сообщений: ${messages.length}`);
+
+                    if (messages.length === 0) {
+                        console.log('✅ Сообщений больше нет — скрываем кнопку');
+                        if (buttonContainer) {
+                            buttonContainer.style.display = 'none';
+                        }
+                        return;
+                    }
+
+                    messages.sort((a, b) => new Date(a.CreateAt) - new Date(b.CreateAt));
+
+                    const fragment = document.createDocumentFragment();
+
+                    messages.forEach(msg => {
+                        if (seenTimestamps.has(msg.CreateAt)) return;
+                        seenTimestamps.add(msg.CreateAt);
+                        fragment.appendChild(createMessageElement(msg));
+                    });
+
+                    if (buttonContainer) {
+                        buttonContainer.after(fragment);
+                        console.log('✅ Старые сообщения вставлены');
+                    } else {
+                        messagesContainer.appendChild(fragment);
+                    }
+
+                    loadMoreOffset++;
+
+                } catch (err) {
+                    console.error("❌ Ошибка загрузки старых сообщений:", err);
+                } finally {
+                    isLoading = false;
+                }
+            }
+
+            // Проверка новых сообщений (поллинг)
+            async function checkNewMessages() {
+                if (isLoading || !lastTimestamp) return;
+
+                try {
+                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=0`);
+                    if (!response.ok) return;
+
+                    let messages = await response.json();
+                    if (messages.length === 0) return;
+
+                    messages.sort((a, b) => new Date(a.CreateAt) - new Date(b.CreateAt));
+
+                    let hasNew = false;
+
+                    messages.forEach(msg => {
+                        if (seenTimestamps.has(msg.CreateAt)) return;
+
+                        if (new Date(msg.CreateAt) > new Date(lastTimestamp)) {
+                            seenTimestamps.add(msg.CreateAt);
+                            const msgElement = createMessageElement(msg);
+                            messagesContainer.appendChild(msgElement);
+                            hasNew = true;
+                        }
+                    });
+
+                    if (hasNew) {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        lastTimestamp = messages[messages.length - 1].CreateAt;
+                    }
+                } catch (err) {
+                    console.error("Ошибка проверки новых сообщений:", err);
+                }
+            }
+
+            sendBtn.addEventListener("click", async function() {
+                const text = input.value.trim();
+                if (!text) return;
+
+                const tempId = 'temp-' + Date.now();
+
+                // Оптимистичное сообщение с "Отправка..."
+                const optimisticMsg = {
+                    Text: text,
+                    CreateAt: new Date().toISOString(),
+                    MyMessage: true,
+                    tempId: tempId
+                };
+
+                const msgElement = createMessageElement(optimisticMsg);
+                msgElement.dataset.tempId = tempId;
+                
+                // Заменяем время на "Отправка..."
+                const timestampSpan = msgElement.querySelector('.timestamp');
+                timestampSpan.textContent = 'Отправка...';
+                timestampSpan.style.color = '#007BFF'; // синий цвет для выделения
+
+                messagesContainer.appendChild(msgElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                input.value = "";
+
+                try {
+                    const response = await fetch("/messenger/send-message", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            text: text,
+                            ReceivedUser: partnerID,
+                            partnerID: partnerID
+                        })
+                    });
+
+                    if (response.ok) {
+                        // Успешно отправлено → сразу запрашиваем актуальные сообщения
+                        await checkNewMessages();
+
+                        // Удаляем оптимистичное сообщение
+                        const tempElement = messagesContainer.querySelector(`[data-temp-id="${tempId}"]`);
+                        if (tempElement) {
+                            tempElement.remove();
+                        }
+                    } else {
+                        // Ошибка отправки
+                        const tempElement = messagesContainer.querySelector(`[data-temp-id="${tempId}"]`);
+                        if (tempElement) tempElement.remove();
+                        alert("Ошибка отправки сообщения");
+                    }
+                } catch (err) {
+                    console.error("Ошибка отправки:", err);
+                    const tempElement = messagesContainer.querySelector(`[data-temp-id="${tempId}"]`);
+                    if (tempElement) tempElement.remove();
+                }
+            });
+
+            input.addEventListener("keypress", e => {
+                if (e.key === "Enter") sendBtn.click();
+            });
+
+            // Запуск
+            loadInitialMessages();
+            setInterval(checkNewMessages, 10000);
+        });
+        </script>
+    {{end}}
+</body>
+</html>

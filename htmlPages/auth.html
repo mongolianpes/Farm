@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 75px);
+        }
+
+        .container {
+            background: #fff;
+            padding: 35px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 380px;
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .error { 
+            color: red; 
+            text-align: center; 
+            margin: 12px 0;
+        }
+
+        input[type="text"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;        /* увеличил отступы */
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;           /* важно для мобильных */
+        }
+
+        input[type="password"] {
+            letter-spacing: 1px;       /* немного разносит символы пароля */
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        button:hover { 
+            background: #0056b3; 
+        }
+
+        p {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+
+    <!-- Подключаем внешний CSS -->
+    <link rel="stylesheet" href="/static/header.css">
+</head>
+<body>
+    {{template "header"}}
+    <div class="main-content">
+<div class="container">
+    <h2>Авторизация</h2>
+    <form action="/auth" method="post">
+        <input type="text" name="login" placeholder="Логин" value="{{.Login}}" required>
+        <input type="password" name="password" placeholder="Пароль" value="{{.Password}}" required>
+        <button type="submit">Войти</button>
+    </form>
+    <p style="text-align:center;">
+        Нет аккаунта? <a href="/register">Регистрация</a>
+    </p>
+
+    <div class="error" id="auth-error">
+        {{if .Error}}
+          <p>{{.Error}}</p>
+        {{end}}
+    </div>
+</div>
+</div>
+</body>
+</html>

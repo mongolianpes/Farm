@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создать объявление</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+
+        .error { 
+            color: red; 
+            text-align: center; 
+            margin: 10px 0;
+        }
+
+        input[type="text"], textarea, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover { 
+            background: #0056b3; 
+        }
+
+        .preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        input[type="file"] {
+            display: block;       /* гарантирует, что поле видно */
+            width: 100%;
+            padding: 6px;         /* чуть меньше, чем у текстовых полей */
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background: #fff;
+            cursor: pointer;
+        }
+
+    </style>
+    
+    <link rel="stylesheet" href="/static/header.css">
+</head>
+<body>
+    {{template "header"}}
+    <div class="main-content">
+        <div class="container">
+            <h2>Новое объявление</h2>
+            <form action="/announcements/create" method="post" enctype="multipart/form-data">
+                <input type="text" name="title" placeholder="Название" value="{{.Title}}" required>
+                <textarea name="description" placeholder="Описание" rows="5" required>{{.Description}}</textarea>
+                
+                <!-- Выбор категории -->
+                <label for="category">Категория товара:</label>
+                <select name="category" id="category" required>
+                    <option value="">-- Выберите категорию --</option>
+                    <option value="Участки" {{if eq .Category "Участки"}}selected{{end}}>Участки</option>
+                    <option value="Животноводство" {{if eq .Category "Животноводство"}}selected{{end}}>Животноводство</option>
+                    <option value="Растеневодство" {{if eq .Category "Растеневодство"}}selected{{end}}>Растеневодство</option>
+                    <option value="Другое" {{if eq .Category "Другое"}}selected{{end}}>Другое</option>
+                </select>
+
+                <!-- Загрузка до 10 картинок -->
+                <input type="file" name="images" id="images" accept="image/*" multiple>
+                <small>Можно выбрать до 10 изображений</small>
+                <div class="preview" id="preview"></div>
+
+                <button type="submit">Создать</button>
+            </form>
+            <div class="error" id="ad-error">
+                {{if .Error}}
+                  <p>{{.Error}}</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById("images");
+        const preview = document.getElementById("preview");
+
+        input.addEventListener("change", () => {
+            preview.innerHTML = "";
+            const files = Array.from(input.files).slice(0, 10); // ограничение до 10
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+</body>
+</html>
