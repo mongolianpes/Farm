@@ -3,6 +3,7 @@ package embedding
 import (
 	"bytes"
 	"database/sql"
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -19,18 +20,38 @@ var client = &http.Client{
 
 const userAdaptationRate = 0.9
 
-type Response struct {
+type ollamaJsonResponse struct {
 	Embedding []float64
+}
+
+type ollamaJsonRequest struct {
+	model  string
+	prompt string
 }
 
 var ollamaHost = os.Getenv("OLLAMA_HOST")
 
 func InsertEmbedding(db *sql.DB, rowID int, text, insertCommand string) error {
-	jsonBody := []byte(`{"model":  "nomic-embed-text", "prompt": "` + text + `"}`)
+	if ollamaHost == "" {
+		return errors.New("Переменная OLLAMA_HOST должна иметь значение: адрес локальной нейросети ollama")
+	}
+
+	req := ollamaJsonRequest{
+		model:  "nomic-embed-text",
+		prompt: text,
+	}
+
+	jsonBody, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
 
 	resp, err := client.Post(ollamaHost+"/api/embeddings", "application/json", bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("Ollama вернул статус код не 200")
 	}
 
 	defer func() {
@@ -38,7 +59,7 @@ func InsertEmbedding(db *sql.DB, rowID int, text, insertCommand string) error {
 		resp.Body.Close()
 	}()
 
-	var result Response
+	var result ollamaJsonResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return err
 	}
@@ -51,9 +72,9 @@ func InsertEmbedding(db *sql.DB, rowID int, text, insertCommand string) error {
 	return nil
 }
 
-func UpdateUserEmbedding(db *sql.DB, userEmbedding, announcementEmbedding *[]float32, userID int) error {
+func UpdateUserEmbedding(db *sql.DB, userEmbedding, announcementEmbedding *[]float64, userID int) error {
 	for i := range *userEmbedding {
-		(*userEmbedding)[i] = float32(userAdaptationRate)*(*userEmbedding)[i] + float32(1-userAdaptationRate)*(*announcementEmbedding)[i]
+		(*userEmbedding)[i] = float64(userAdaptationRate)*(*userEmbedding)[i] + float64(1-userAdaptationRate)*(*announcementEmbedding)[i]
 	}
 
 	if _, err := db.Exec("UPDATE users SET embedding = $1::float8[] WHERE user_id = $2", userEmbedding, userID); err != nil {
