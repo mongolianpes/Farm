@@ -6,7 +6,6 @@ import (
 
 	"project-farm/internal/announcements"
 	"project-farm/internal/handlers"
-	"project-farm/internal/images"
 	"project-farm/internal/session"
 )
 
@@ -19,10 +18,6 @@ func main() {
 	defer hand.DB.Close()
 
 	go session.OldSessionsRemover(hand.DB)
-
-	if err := images.InitService(); err != nil {
-		fmt.Println(err.Error())
-	}
 
 	if err := announcements.InitService(); err != nil {
 		fmt.Println(err.Error())

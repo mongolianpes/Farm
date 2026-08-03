@@ -1,15 +1,17 @@
 package images
 
+import "os"
+
 const (
-	ImagesServiceExternalConnections = "http://localhost:8080"
-	PathToImages                     = ImagesServiceExternalConnections + "/images/"
-	PathToDefaultImage               = ImagesServiceExternalConnections + "/images/d.webp"
-	DefaultImage                     = "d"
+	pathToImages       = "/images/"
+	pathToDefaultImage = "/images/d.webp"
 )
+
+var imagesServiceExternalConnections = os.Getenv("IMAGES_SERVICE_EXTERNAL_CONNECTIONS")
 
 func MakeCurrentPathToImage(imageName string) string {
 	if imageName == "" {
-		return PathToDefaultImage
+		return imagesServiceExternalConnections + pathToDefaultImage
 	}
-	return PathToImages + imageName
+	return imagesServiceExternalConnections + pathToImages + imageName
 }

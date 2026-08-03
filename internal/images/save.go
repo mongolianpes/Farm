@@ -6,6 +6,8 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
+	"sync"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -13,21 +15,42 @@ import (
 	pb "project-farm/internal/images/proto"
 )
 
-var client pb.ImageServiceClient
+type imagesClient struct {
+	sync.Mutex
+	service pb.ImageServiceClient
+	conn    *grpc.ClientConn
+}
+
+var client imagesClient
+
 var imagesServiceHost = os.Getenv("IMAGES_SERVICE_HOST_GRPC_PORT")
 
-func InitService() error {
+func initService() error {
+	client.Lock()
+	defer client.Unlock()
+	if client.service != nil {
+		return nil
+	}
+
 	conn, err := grpc.NewClient(imagesServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
 
-	client = pb.NewImageServiceClient(conn)
+	client.conn = conn
+	client.service = pb.NewImageServiceClient(conn)
 	return nil
 }
 
 func SaveImage(width, height int32, file multipart.File) (string, error) {
-	stream, err := client.DownloadImages(context.Background())
+	if err := initService(); err != nil {
+		return "", err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	stream, err := client.service.DownloadImages(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -93,6 +116,7 @@ func CheckCurrentFileExtansion(header *multipart.FileHeader) bool {
 	filenameSplitted := strings.Split(header.Filename, ".")
 	fileExtansion := filenameSplitted[len(filenameSplitted)-1]
 
+	fileExtansion = strings.ToLower(fileExtansion)
 	switch fileExtansion {
 	case "png", "jpg", "jpeg", "webp":
 		return true
