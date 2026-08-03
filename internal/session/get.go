@@ -8,7 +8,7 @@ import (
 )
 
 func GetUserID(db *sql.DB, w http.ResponseWriter, r *http.Request) (int, error) {
-	var userID int
+	var userID int = -1
 	var createAt time.Time
 	cookie, err := r.Cookie(SessionIDCookieName)
 	if err != nil {
@@ -24,7 +24,7 @@ func GetUserID(db *sql.DB, w http.ResponseWriter, r *http.Request) (int, error) 
 		}
 	}
 
-	if createAt.Add(24 * time.Hour).After(time.Now()) {
+	if createAt.Add(24 * time.Hour).Before(time.Now()) {
 		SetSessionID(db, userID, w)
 	}
 
@@ -48,7 +48,7 @@ func GetUserIDStr(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, e
 		}
 	}
 
-	if createAt.Add(24 * time.Hour).After(time.Now()) {
+	if createAt.Add(24 * time.Hour).Before(time.Now()) {
 		SetSessionIDStr(db, userID, w)
 	}
 

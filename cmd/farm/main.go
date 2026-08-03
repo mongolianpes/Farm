@@ -18,7 +18,7 @@ func main() {
 	hand := handlers.NewHand()
 	defer hand.DB.Close()
 
-	go session.DeleteOldSessions(hand.DB)
+	go session.OldSessionsRemover(hand.DB)
 
 	if err := images.InitService(); err != nil {
 		fmt.Println(err.Error())
