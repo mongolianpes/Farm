@@ -71,15 +71,3 @@ func InsertEmbedding(db *sql.DB, rowID int, text, insertCommand string) error {
 
 	return nil
 }
-
-func UpdateUserEmbedding(db *sql.DB, userEmbedding, announcementEmbedding *[]float64, userID int) error {
-	for i := range *userEmbedding {
-		(*userEmbedding)[i] = float64(userAdaptationRate)*(*userEmbedding)[i] + float64(1-userAdaptationRate)*(*announcementEmbedding)[i]
-	}
-
-	if _, err := db.Exec("UPDATE users SET embedding = $1::float8[] WHERE user_id = $2", userEmbedding, userID); err != nil {
-		return err
-	}
-
-	return nil
-}
