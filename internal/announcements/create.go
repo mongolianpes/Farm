@@ -17,7 +17,7 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
-	stream, err := client.service.CreateAnnouncement(ctx)
+	streamCreate, err := client.service.CreateAnnouncement(ctx)
 	if err != nil {
 		return err
 	}
@@ -29,16 +29,16 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 		AuthorID:    authorID,
 	}
 
-	if err := stream.Send(req); err != nil {
+	if err := streamCreate.Send(req); err != nil {
 		return err
 	}
 
-	resp, err := stream.Recv()
+	respCreate, err := streamCreate.CloseAndRecv()
 	if err != nil {
 		return err
 	}
-	if resp.Error != "" {
-		return errors.New(resp.Error)
+	if respCreate.Error != "" {
+		return errors.New(respCreate.Error)
 	}
 
 	if len(images) >= 1 {
@@ -47,23 +47,27 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 			return err
 		}
 
-		if err := stream.Send(&pb.CreateAnnouncementRequest{
-			ImagesPath: imagesPath,
+		streamAddImages, err := client.service.AddImages(ctx)
+		if err != nil {
+			DeleteAnnouncement(int(respCreate.AnnouncementID))
+			return err
+		}
+
+		if err := streamAddImages.Send(&pb.AddImagesRequest{
+			ImagesPath:     imagesPath,
+			AnnouncementID: respCreate.AnnouncementID,
 		}); err != nil {
 			return err
 		}
-	}
 
-	if err := stream.CloseSend(); err != nil {
-		return err
-	}
-
-	final, err := stream.Recv()
-	if err != nil {
-		return err
-	}
-	if final.Error != "" {
-		return errors.New(final.Error)
+		respAddImages, err := streamAddImages.CloseAndRecv()
+		if err != nil {
+			DeleteAnnouncement(int(respCreate.AnnouncementID))
+			return err
+		}
+		if respAddImages.Error != "" {
+			return errors.New(respAddImages.Error)
+		}
 	}
 
 	return nil
@@ -76,7 +80,6 @@ func saveImages(images []*multipart.FileHeader) ([]string, error) {
 		if err != nil {
 			continue
 		}
-		defer file.Close()
 
 		if !imagesService.CheckCurrentFileExtansion(fileHeader) {
 			continue
@@ -88,6 +91,7 @@ func saveImages(images []*multipart.FileHeader) ([]string, error) {
 		}
 
 		imagesForDataBase = append(imagesForDataBase, filenameForDataBase)
+		file.Close()
 	}
 
 	if len(imagesForDataBase) == 0 {
