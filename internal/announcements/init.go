@@ -37,3 +37,7 @@ func initService() error {
 	client.conn = conn
 	return nil
 }
+
+func CloseConnectionToService() error {
+	return client.conn.Close()
+}

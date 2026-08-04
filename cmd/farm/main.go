@@ -1,10 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"project-farm/internal/announcements"
 	"project-farm/internal/handlers"
+	"project-farm/internal/images"
 	"project-farm/internal/session"
 )
 
@@ -34,5 +41,33 @@ func main() {
 	mux.HandleFunc("/messenger/send-message", hand.SendMessageHandler)
 	mux.HandleFunc("/messenger/get-messages", hand.GetMessagesHandler)
 
-	fmt.Println(http.ListenAndServe(sitePort, mux))
+	server := &http.Server{
+		Handler: mux,
+		Addr:    sitePort,
+	}
+
+	go server.ListenAndServe()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := images.CloseConnectionToService(); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := announcements.CloseConnectionToService(); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := hand.DB.Close(); err != nil {
+		fmt.Println(err.Error())
+	}
 }

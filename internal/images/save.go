@@ -43,6 +43,10 @@ func initService() error {
 	return nil
 }
 
+func CloseConnectionToService() error {
+	return client.conn.Close()
+}
+
 func SaveImage(width, height int32, file multipart.File) (string, error) {
 	if err := initService(); err != nil {
 		return "", err
