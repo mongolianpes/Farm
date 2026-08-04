@@ -46,6 +46,7 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 		userID, err := session.GetUserID(h.DB, w, r)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+			return
 		}
 
 		query := `SELECT DISTINCT 
@@ -114,6 +115,11 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	var sendMessage SendMessage
 	if err := json.NewDecoder(r.Body).Decode(&sendMessage); err != nil {
 		http.Error(w, "Сообщение не отправлено", http.StatusBadRequest)
+		return
+	}
+
+	if sendMessage.Text == "" {
+		http.Error(w, "Сообщение не должно быть пустым", http.StatusBadRequest)
 		return
 	}
 

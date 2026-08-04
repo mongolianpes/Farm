@@ -59,6 +59,12 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(data.Password) <= 9 {
+		data.Error = "Длина пароля должна быть больше 9 символов"
+		h.Tmpl.ExecuteTemplate(w, "register.html", data)
+		return
+	}
+
 	password, err := crypto.HashString(r.FormValue("password"))
 	if err != nil {
 		data.Error = "Не удалось вас зарегистрировать с данным паролем, попробуйте другой"
@@ -169,7 +175,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(10 * 365 * 24 * time.Hour),
 	})
 
-	if userAvatarPathName != "" {
+	if avatarPath != "" {
 		http.SetCookie(w, &http.Cookie{
 			Name:     userAvatarPathName,
 			Value:    images.MakeCurrentPathToImage(avatarPath),
@@ -218,9 +224,14 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	announcementsData, err := getAnnouncementsByParameters(h.DB, w, r)
-	if err == nil {
-		data.Announcements = announcementsData
+	if err != nil {
+		if err.Error() == "User have not session" {
+			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+			return
+		}
 	}
+
+	data.Announcements = announcementsData
 
 	h.Tmpl.ExecuteTemplate(w, "profile.html", data)
 }

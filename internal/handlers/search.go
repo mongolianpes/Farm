@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -13,7 +13,10 @@ import (
 func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	data, err := getAnnouncementsByParameters(h.DB, w, r)
 	if err != nil {
-		fmt.Println(err.Error())
+		if err.Error() == "User have not session" {
+			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+			return
+		}
 		data = []*announcements.AnnouncementData{}
 	}
 
@@ -57,7 +60,7 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 		} else {
 			userID, err = session.GetUserIDStr(db, w, r)
 			if err != nil {
-				http.Redirect(w, r, "/auth", http.StatusSeeOther)
+				return data, errors.New("User have not session")
 			}
 		}
 	}

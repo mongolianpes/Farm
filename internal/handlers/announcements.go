@@ -36,6 +36,7 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	r.ParseMultipartForm(20 << 20)
 	title := r.FormValue("title")
 	description := r.FormValue("description")
 	category := r.FormValue("category")
@@ -45,9 +46,9 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		data.Category = category
 		data.Error = "Введите информацию во всех полях"
 		h.Tmpl.ExecuteTemplate(w, "create-announcement.html", data)
+		return
 	}
 
-	r.ParseMultipartForm(20 << 20)
 	images := r.MultipartForm.File["images"]
 	if len(images) > 10 {
 		data.Description = description
@@ -82,7 +83,10 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 	data := AnnouncementsData{}
 	data.Announcements, err = getAnnouncementsByParameters(h.DB, w, r)
 	if err != nil {
-		fmt.Println(err.Error())
+		if err.Error() == "User have not session" {
+			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+			return
+		}
 		http.Error(w, "Не удалось получить объявления, попробуйте позже", http.StatusInternalServerError)
 		return
 	}
@@ -96,7 +100,8 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, announcementID int) {
 	userID, err := session.GetUserID(h.DB, w, r)
 	if err != nil {
-		http.Redirect(w, r, "/announcements", http.StatusBadRequest)
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
 	}
 
 	announcementInfo, err := announcements.GetAnnouncementInfo(announcementID, userID)
