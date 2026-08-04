@@ -8,7 +8,14 @@ import (
 )
 
 func DeleteAnnouncement(id int) error {
-	resp, err := client.DeleteAnnouncement(context.Background(), &pb.DeleteAnnouncementRequest{
+	if err := initService(); err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	resp, err := client.service.DeleteAnnouncement(ctx, &pb.DeleteAnnouncementRequest{
 		AnnouncementID: int32(id),
 	})
 	if err != nil {

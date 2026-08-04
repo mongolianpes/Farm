@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"project-farm/internal/announcements"
 	"project-farm/internal/handlers"
 	"project-farm/internal/session"
 )
@@ -18,10 +17,6 @@ func main() {
 	defer hand.DB.Close()
 
 	go session.OldSessionsRemover(hand.DB)
-
-	if err := announcements.InitService(); err != nil {
-		fmt.Println(err.Error())
-	}
 
 	mux := http.NewServeMux()
 

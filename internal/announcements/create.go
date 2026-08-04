@@ -10,7 +10,14 @@ import (
 )
 
 func CreateAnnouncement(title, description, category, authorID string, images []*multipart.FileHeader) error {
-	stream, err := client.CreateAnnouncement(context.Background())
+	if err := initService(); err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	stream, err := client.service.CreateAnnouncement(ctx)
 	if err != nil {
 		return err
 	}
@@ -67,21 +74,24 @@ func saveImages(images []*multipart.FileHeader) ([]string, error) {
 	for _, fileHeader := range images {
 		file, err := fileHeader.Open()
 		if err != nil {
-			return imagesForDataBase, errors.New("Ошибка открытия одного из файлов")
+			continue
 		}
 		defer file.Close()
 
 		if !imagesService.CheckCurrentFileExtansion(fileHeader) {
-			return imagesForDataBase, errors.New("Попробуйте загрузить картинку в другом формате (png, jpg, webp)")
+			continue
 		}
 
 		filenameForDataBase, err := imagesService.SaveImage(0, 0, file)
 		if err != nil {
-			return imagesForDataBase, errors.New("Ошибка сохранеия одного из файлов")
+			continue
 		}
 
 		imagesForDataBase = append(imagesForDataBase, filenameForDataBase)
 	}
 
+	if len(imagesForDataBase) == 0 {
+		return imagesForDataBase, errors.New("Загружайте картинки в форматах: png, jpg, webp")
+	}
 	return imagesForDataBase, nil
 }

@@ -22,8 +22,9 @@ type imagesClient struct {
 }
 
 var client imagesClient
-
 var imagesServiceHost = os.Getenv("IMAGES_SERVICE_HOST_GRPC_PORT")
+
+const timeToCompleteRequest = 30 * time.Second
 
 func initService() error {
 	client.Lock()
@@ -47,7 +48,7 @@ func SaveImage(width, height int32, file multipart.File) (string, error) {
 		return "", err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
 	stream, err := client.service.DownloadImages(ctx)

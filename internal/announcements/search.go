@@ -20,7 +20,14 @@ type AnnouncementData struct {
 }
 
 func SearchAnnouncements(offset, announcementID int, userID, SearchString, category, orderBy, authorID string) ([]*AnnouncementData, error) {
-	stream, err := client.SearchAnnouncements(context.Background())
+	if err := initService(); err != nil {
+		return []*AnnouncementData{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	stream, err := client.service.SearchAnnouncements(ctx)
 	if err != nil {
 		return []*AnnouncementData{}, err
 	}
@@ -44,7 +51,7 @@ func SearchAnnouncements(offset, announcementID int, userID, SearchString, categ
 		return []*AnnouncementData{}, err
 	}
 	if resp.Error != "" {
-		return []*AnnouncementData{}, err
+		return []*AnnouncementData{}, errors.New(resp.Error)
 	}
 
 	result := []*AnnouncementData{}
@@ -65,7 +72,14 @@ func SearchAnnouncements(offset, announcementID int, userID, SearchString, categ
 }
 
 func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
-	stream, err := client.SearchAnnouncements(context.Background())
+	if err := initService(); err != nil {
+		return AnnouncementData{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	stream, err := client.service.SearchAnnouncements(ctx)
 	if err != nil {
 		return AnnouncementData{}, err
 	}
@@ -84,7 +98,7 @@ func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
 		return AnnouncementData{}, err
 	}
 	if resp.Error != "" {
-		return AnnouncementData{}, err
+		return AnnouncementData{}, errors.New(resp.Error)
 	}
 
 	for _, announcement := range resp.AnnouncementsData {
