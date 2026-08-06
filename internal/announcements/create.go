@@ -44,6 +44,7 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 	if len(images) >= 1 {
 		imagesPath, err := saveImages(images)
 		if err != nil {
+			DeleteAnnouncement(int(respCreate.AnnouncementID))
 			return err
 		}
 

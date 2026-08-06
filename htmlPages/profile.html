@@ -187,7 +187,6 @@
             border-radius: 50%;
             object-fit: cover;
             margin-right: 10px;
-            display: none;
             box-shadow: 0 0 8px rgba(0,0,0,0.2);
         }
         #icon {
@@ -227,8 +226,7 @@
     <div class="main-content">
         <div class="profile-header">
             <div class="avatar-container">
-                <img id="avatar-profile" src="" alt="Аватар" class="avatar-img">
-                <span id="icon-profile">👤</span>
+                <img src="{{.AvatarPath}}" alt="Аватар" class="avatar-img">
             </div>
             <h1>{{.Name}}</h1>
             <div class="login">@{{.Login}}</div>

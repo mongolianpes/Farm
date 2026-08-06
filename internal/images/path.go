@@ -3,8 +3,9 @@ package images
 import "os"
 
 const (
-	pathToImages       = "/images/"
-	pathToDefaultImage = "/images/d.webp"
+	imagesServiceAddr  = "http://localhost:8080"
+	pathToImages       = imagesServiceAddr + "/images/"
+	pathToDefaultImage = imagesServiceAddr + "/images/d.webp"
 )
 
 var imagesServiceExternalConnections = os.Getenv("IMAGES_SERVICE_EXTERNAL_CONNECTIONS")

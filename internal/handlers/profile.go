@@ -42,6 +42,7 @@ type ProfileData struct {
 	Login         string
 	ID            int
 	SearchString  string
+	AvatarPath    string
 	Announcements []*announcements.AnnouncementData
 }
 
@@ -59,7 +60,7 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(data.Password) <= 9 {
+	if len(r.FormValue("password")) <= 9 {
 		data.Error = "Длина пароля должна быть больше 9 символов"
 		h.Tmpl.ExecuteTemplate(w, "register.html", data)
 		return
@@ -195,6 +196,7 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var userID int
 	var name string
+	var avatarPath string
 	var err error
 	login := r.URL.Query().Get("login")
 	if login == myLoginAlias || login == "" {
@@ -205,21 +207,24 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := h.DB.QueryRow("SELECT name FROM users WHERE user_id = $1", userID).Scan(&name); err != nil {
+		if err := h.DB.QueryRow("SELECT name, avatar_path FROM users WHERE user_id = $1", userID).Scan(&name, &avatarPath); err != nil {
 			http.Error(w, "Не удалось найти данного пользователя", http.StatusBadRequest)
 			return
 		}
 	} else {
-		if err := h.DB.QueryRow("SELECT name, user_id FROM users WHERE login = $1", login).Scan(&name, &userID); err != nil {
+		if err := h.DB.QueryRow("SELECT name, user_id, avatar_path FROM users WHERE login = $1", login).Scan(&name, &userID, &avatarPath); err != nil {
 			http.Error(w, "Не удалось найти данного пользователя", http.StatusBadRequest)
 			return
 		}
 	}
 
+	avatarPath = images.MakeCurrentPathToImage(avatarPath)
+
 	data := ProfileData{
 		Name:         name,
 		Login:        login,
 		ID:           userID,
+		AvatarPath:   avatarPath,
 		SearchString: r.URL.Query().Get("search"),
 	}
 

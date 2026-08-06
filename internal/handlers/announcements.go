@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"project-farm/internal/announcements"
+	"project-farm/internal/images"
 	"project-farm/internal/session"
 )
 
@@ -105,9 +106,17 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, an
 	}
 
 	announcementInfo, err := announcements.GetAnnouncementInfo(announcementID, userID)
+	if err != nil {
+		announcementInfo.Description = "Произошла ошибка " + err.Error()
+	}
 
 	data := AnnouncementsData{
 		Announcements: []*announcements.AnnouncementData{},
+	}
+
+	var imagesWithCurrentPath []string
+	for _, image := range announcementInfo.Images {
+		imagesWithCurrentPath = append(imagesWithCurrentPath, images.MakeCurrentPathToImage(image))
 	}
 
 	data.Announcements = append(data.Announcements, &announcements.AnnouncementData{
@@ -116,9 +125,13 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, an
 		Title:          announcementInfo.Title,
 		Description:    announcementInfo.Description,
 		Category:       announcementInfo.Category,
-		Images:         announcementInfo.Images,
+		Images:         imagesWithCurrentPath,
 		AnnouncementID: announcementInfo.AnnouncementID,
 	})
+
+	for _, a := range data.Announcements {
+		fmt.Println("show announcementss:\n", a)
+	}
 
 	data.ManyAnnouncements = false
 
@@ -127,7 +140,6 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, an
 
 func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		fmt.Println("not post")
 		http.Redirect(w, r, "/profile?login=my", http.StatusSeeOther)
 		return
 	}
@@ -135,15 +147,11 @@ func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 	idStr := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		fmt.Println(err.Error())
 		http.Redirect(w, r, "/profile?login=my", http.StatusSeeOther)
 		return
 	}
-	fmt.Println("str id an to del: ", idStr)
-	fmt.Println("int id an to del: ", id)
 
 	if err := announcements.DeleteAnnouncement(id); err != nil {
-		fmt.Println(err.Error())
 		http.Redirect(w, r, "/profile?login=my", http.StatusSeeOther)
 		return
 	}
