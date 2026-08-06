@@ -11,7 +11,7 @@ import (
 
 func CreateAnnouncement(title, description, category, authorID string, images []*multipart.FileHeader) error {
 	if err := initService(); err != nil {
-		return err
+		return errors.New("Попробуйте создать чуть позже")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
@@ -19,7 +19,7 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 
 	streamCreate, err := client.service.CreateAnnouncement(ctx)
 	if err != nil {
-		return err
+		return errors.New("Попробуйте создать чуть позже")
 	}
 
 	req := &pb.CreateAnnouncementRequest{
@@ -30,7 +30,7 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 	}
 
 	if err := streamCreate.Send(req); err != nil {
-		return err
+		return errors.New("Попробуйте создать чуть позже")
 	}
 
 	respCreate, err := streamCreate.CloseAndRecv()

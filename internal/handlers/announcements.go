@@ -50,6 +50,15 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	if len(description) > 100 || len(title) > 10 {
+		data.Description = description
+		data.Title = title
+		data.Category = category
+		data.Error = "Название должно быть не больше 10 символов, а описание не больше 100"
+		h.Tmpl.ExecuteTemplate(w, "create-announcement.html", data)
+		return
+	}
+
 	images := r.MultipartForm.File["images"]
 	if len(images) > 10 {
 		data.Description = description
@@ -64,7 +73,7 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		data.Description = description
 		data.Title = title
 		data.Category = category
-		data.Error = "Неизвестная ошибка"
+		data.Error = err.Error()
 		h.Tmpl.ExecuteTemplate(w, "create-announcement.html", data)
 		return
 	}
@@ -84,6 +93,7 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 	data := AnnouncementsData{}
 	data.Announcements, err = getAnnouncementsByParameters(h.DB, w, r)
 	if err != nil {
+		fmt.Println(err.Error())
 		if err.Error() == "User have not session" {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
