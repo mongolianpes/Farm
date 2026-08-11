@@ -27,7 +27,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", hand.HomePageHandler)
+	mux.HandleFunc("/{$}", hand.HomePageHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("/register", hand.RegisterHandler)
 	mux.HandleFunc("/auth", hand.AuthHandler)
@@ -41,8 +41,17 @@ func main() {
 	mux.HandleFunc("/messenger/send-message", hand.SendMessageHandler)
 	mux.HandleFunc("/messenger/get-messages", hand.GetMessagesHandler)
 
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if _, pattern := mux.Handler(r); pattern == "" {
+			http.ServeFile(w, r, handlers.HTMLPagesPath+"404.html")
+			return
+		}
+
+		mux.ServeHTTP(w, r)
+	})
+
 	server := &http.Server{
-		Handler: mux,
+		Handler: handler,
 		Addr:    sitePort,
 	}
 
