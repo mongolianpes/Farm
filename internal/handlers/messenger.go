@@ -3,9 +3,9 @@ package handlers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"project-farm/internal/images"
+	"project-farm/internal/messenger"
 	"project-farm/internal/session"
 )
 
@@ -14,28 +14,17 @@ const (
 )
 
 type MessengerData struct {
-	Name          string
-	PartnerAvatar string
-	PartnerID     string
-	Partners      []PartnerInfo
-}
-
-type PartnerInfo struct {
-	Name       string
-	AvatarPath string
-	ID         int
-}
-
-type MessageData struct {
-	CreateAt  time.Time
-	Text      string
-	MyMessage bool
+	Name                  string
+	PartnerAvatar         string
+	PartnerID             int
+	RelatedAnnouncementID int
+	Partners              []*messenger.ChatInfo
 }
 
 type SendMessage struct {
-	Text               string `json:"text"`
-	ReceivedUsed       string `json:"receiveduser"`
-	InitAnnouncementID int    `json:"initannouncementid"`
+	Text                  string `json:"text"`
+	ReceivedUsedID        int    `json:"receiveduserid"`
+	RelatedAnnouncementID int    `json:"relatedannouncementid"`
 }
 
 func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,50 +38,31 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		query := `SELECT DISTINCT 
-	CASE 
-        WHEN sender_id = $1 THEN received_id 
-        ELSE sender_id 
-    END AS partner_id
-FROM messages 
-WHERE sender_id = $1 OR received_id = $1;`
-		rows, err := h.DB.Query(query, userID)
+		chats, err := messenger.GetUserChats(userID)
 		if err != nil {
-			http.Error(w, "Ошибка получения ID партнера", http.StatusInternalServerError)
+			http.Error(w, "Ошибка при получении чатов", http.StatusInternalServerError)
 			return
 		}
 
-		var receivedID int
-		var receivedName string
-		var receivedAvatarPath string
-		for rows.Next() {
-			if err := rows.Scan(&receivedID); err != nil {
-				http.Error(w, "Не удалось получить партнеров", http.StatusInternalServerError)
-				return
-			}
-
-			if err := h.DB.QueryRow("SELECT name, avatar_path FROM users WHERE user_id = $1", receivedID).Scan(&receivedName, &receivedAvatarPath); err != nil {
-				http.Error(w, "Не получили имя и аватар партнера", http.StatusInternalServerError)
-				return
-			}
-
-			receivedAvatarPath = images.MakeCurrentPathToImage(receivedAvatarPath)
-
-			pageData.Partners = append(pageData.Partners, PartnerInfo{
-				Name:       receivedName,
-				AvatarPath: receivedAvatarPath,
-				ID:         receivedID,
-			})
-		}
+		pageData.Partners = append(pageData.Partners, chats...)
 	} else {
-		pageData.PartnerID = partnerID
+		var err error
+		pageData.PartnerID, err = strconv.Atoi(partnerID)
+		if err != nil {
+			http.Error(w, "Неверный partnerID", http.StatusBadRequest)
+		}
 
 		if err := h.DB.QueryRow("SELECT name, avatar_path FROM users WHERE user_id = $1", partnerID).Scan(&pageData.Name, &pageData.PartnerAvatar); err != nil {
 			http.Error(w, "Не удалось получить партнера", http.StatusInternalServerError)
 			return
 		}
 
-		// initAnnouncementID := r.URL.Query().Get("announcementid")
+		relatedAnnouncementID := r.URL.Query().Get("relatedannouncementid")
+		pageData.RelatedAnnouncementID, err = strconv.Atoi(relatedAnnouncementID)
+		if err != nil {
+			http.Error(w, "Неверное relatedAnnouncementID", http.StatusBadRequest)
+			return
+		}
 
 		pageData.PartnerAvatar = images.MakeCurrentPathToImage(pageData.PartnerAvatar)
 	}
@@ -114,18 +84,12 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 	var sendMessage SendMessage
 	if err := json.NewDecoder(r.Body).Decode(&sendMessage); err != nil {
-		http.Error(w, "Сообщение не отправлено", http.StatusBadRequest)
+		http.Error(w, "Не удалось разобрать полученный данные", http.StatusBadRequest)
 		return
 	}
 
-	if sendMessage.Text == "" {
-		http.Error(w, "Сообщение не должно быть пустым", http.StatusBadRequest)
-		return
-	}
-
-	if _, err := h.DB.Exec("INSERT INTO messages (sender_id, received_id, message) VALUES ($1, $2, $3)", userID, sendMessage.ReceivedUsed, sendMessage.Text); err != nil {
-		http.Error(w, "Сообщение не отправлено", http.StatusInternalServerError)
-		return
+	if err := messenger.SendMessege(userID, sendMessage.ReceivedUsedID, sendMessage.RelatedAnnouncementID, sendMessage.Text); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -138,9 +102,14 @@ func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	partnerID := r.URL.Query().Get("partnerid")
-	if partnerID == "" {
+	partnerIDStr := r.URL.Query().Get("partnerid")
+	if partnerIDStr == "" {
 		http.Error(w, "Необходимо укзать параметр partnerid", http.StatusBadRequest)
+		return
+	}
+	partnerID, err := strconv.Atoi(partnerIDStr)
+	if err != nil {
+		http.Error(w, "Должно быть числом partnerid", http.StatusBadRequest)
 		return
 	}
 
@@ -156,37 +125,22 @@ func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	query := "SELECT create_at, message, sender_id FROM messages WHERE (sender_id = $1 AND received_id = $2) OR (sender_id = $2 AND received_id = $1) ORDER BY create_at DESC OFFSET $3 LIMIT $4"
-	rows, err := h.DB.Query(query, userID, partnerID, offsetInt*limitMessagesToShow, limitMessagesToShow)
+	relatedAnnouncementIDStr := r.URL.Query().Get("relatedannouncementid")
+	if relatedAnnouncementIDStr == "" {
+		http.Error(w, "Необходимо укзать параметр relatedannouncementid", http.StatusBadRequest)
+		return
+	}
+	relatedAnnouncementID, err := strconv.Atoi(relatedAnnouncementIDStr)
 	if err != nil {
-		http.Error(w, "Не удалось получить данные из БД", http.StatusInternalServerError)
+		http.Error(w, "Должно быть числом relatedannouncementid", http.StatusBadRequest)
 		return
 	}
 
-	var messages []MessageData
-
-	var myMessage bool
-	var createAt time.Time
-	var text string
-	var senderID int
-	for rows.Next() {
-		if err := rows.Scan(&createAt, &text, &senderID); err != nil {
-			http.Error(w, "Не удалось просканировать данные из БД", http.StatusInternalServerError)
-			return
-		}
-
-		if senderID == userID {
-			myMessage = true
-		} else {
-			myMessage = false
-		}
-
-		messages = append(messages, MessageData{
-			CreateAt:  createAt,
-			Text:      text,
-			MyMessage: myMessage,
-		})
+	chat, err := messenger.GetChatHistory(userID, partnerID, relatedAnnouncementID, offsetInt)
+	if err != nil {
+		http.Error(w, "Ошибка получения чата", http.StatusInternalServerError)
+		return
 	}
 
-	json.NewEncoder(w).Encode(messages)
+	json.NewEncoder(w).Encode(chat)
 }

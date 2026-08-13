@@ -12,6 +12,7 @@ import (
 	"project-farm/internal/announcements"
 	"project-farm/internal/handlers"
 	"project-farm/internal/images"
+	"project-farm/internal/messenger"
 	"project-farm/internal/session"
 )
 
@@ -73,6 +74,10 @@ func main() {
 	}
 
 	if err := announcements.CloseConnectionToService(); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := messenger.CloseConnectionToService(); err != nil {
 		fmt.Println(err.Error())
 	}
 

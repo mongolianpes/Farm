@@ -141,10 +141,10 @@
             <h2 style="margin: 10px 0 20px;">Мои чаты</h2>
             <div class="chat-list">
                 {{range .Partners}}
-                    <a href="/messenger?partnerid={{.ID}}" class="chat-item">
-                        <img src="{{.AvatarPath}}" alt="Аватар">
+                    <a href="/messenger?partnerid={{.PartnerID}}&relatedannouncementid={{.RelatedAnnouncementID}}" class="chat-item">
+                        <img src="{{.PartnerAvatarPath}}" alt="Аватар">
                         <div class="chat-info">
-                            <div class="name">{{.Name}}</div>
+                            <div class="name">{{.PartnerName}}</div>
                             <div class="last-msg">Напишите сообщение...</div>
                         </div>
                     </a>
@@ -167,7 +167,7 @@
             const sendBtn = document.getElementById("sendButton");
             const messagesContainer = document.getElementById("messagesContainer");
 
-            let partnerID = "{{.PartnerID}}";
+            let partnerID = {{.PartnerID}};
             let isLoading = false;
             let lastTimestamp = null;
             const seenTimestamps = new Set();
@@ -213,7 +213,7 @@
                 isLoading = true;
 
                 try {
-                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=0`);
+                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=0&relatedannouncementid={{.RelatedAnnouncementID}}`);
                     if (!response.ok) throw new Error("Ошибка сервера");
 
                     let messages = await response.json();
@@ -256,7 +256,7 @@
                 const button = buttonContainer ? buttonContainer.querySelector('button') : null;
 
                 try {
-                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=${loadMoreOffset}`);
+                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=${loadMoreOffset}&relatedannouncementid={{.RelatedAnnouncementID}}`);
                     if (!response.ok) throw new Error("Ошибка сервера");
 
                     let messages = await response.json();
@@ -302,7 +302,7 @@
                 if (isLoading || !lastTimestamp) return;
 
                 try {
-                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=0`);
+                    const response = await fetch(`/messenger/get-messages?partnerid=${partnerID}&offset=0&relatedannouncementid={{.RelatedAnnouncementID}}`);
                     if (!response.ok) return;
 
                     let messages = await response.json();
@@ -365,8 +365,8 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             text: text,
-                            ReceivedUser: partnerID,
-                            partnerID: partnerID
+                            receiveduserid: partnerID,
+                            relatedannouncementid: {{.RelatedAnnouncementID}}
                         })
                     });
 
@@ -380,16 +380,19 @@
                             tempElement.remove();
                         }
                     } else {
-                        // Ошибка отправки
+                        // Ошибка отправки → читаем текст ошибки
+                        const errorText = await response.text();
                         const tempElement = messagesContainer.querySelector(`[data-temp-id="${tempId}"]`);
                         if (tempElement) tempElement.remove();
-                        alert("Ошибка отправки сообщения");
+                        alert("Ошибка отправки: " + errorText);
                     }
                 } catch (err) {
                     console.error("Ошибка отправки:", err);
                     const tempElement = messagesContainer.querySelector(`[data-temp-id="${tempId}"]`);
                     if (tempElement) tempElement.remove();
+                    alert("Ошибка отправки: " + err.message);
                 }
+
             });
 
             input.addEventListener("keypress", e => {

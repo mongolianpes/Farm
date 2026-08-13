@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  dbtest:
+    image: pgvector/pgvector:pg18
+    container_name: dbtest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: project_farm
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./db/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  messengertest:
+      build: ../../../Messenger
+      container_name: messengertest
+      restart: unless-stopped
+      depends_on:
+        - dbtest
+      environment:
+        DB_HOST: dbtest
+        DB_PORT: 5432
+        DB_USER: postgres
+        DB_PASSWORD: 123
+        DB_NAME: project_farm
+      ports:
+        - "8086:8086"
+
+volumes:
+  postgres_data:
