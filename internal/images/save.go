@@ -3,6 +3,7 @@ package images
 import (
 	"context"
 	"io"
+	"log/slog"
 	"mime/multipart"
 	"os"
 	"strings"
@@ -35,6 +36,7 @@ func initService() error {
 
 	conn, err := grpc.NewClient(imagesServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
+		slog.Warn("Не удалось создать подключение к микросервису Images")
 		return err
 	}
 
@@ -57,11 +59,13 @@ func SaveImage(width, height int32, file multipart.File) (string, error) {
 
 	stream, err := client.service.DownloadImages(ctx)
 	if err != nil {
+		slog.Warn("Не создать стрим с микросервисом Images", "error", err)
 		return "", err
 	}
 
 	imageData, err := io.ReadAll(file)
 	if err != nil {
+		slog.Warn("Не удалось прочать байты переданного файла для передачи микросервису Images", "error", err)
 		return "", err
 	}
 
@@ -79,26 +83,32 @@ func SaveImage(width, height int32, file multipart.File) (string, error) {
 	}
 
 	if err := stream.Send(req); err != nil {
+		slog.Warn("Не удалось совершить запрос к микросервису Images", "error", err)
 		return "", err
 	}
 
 	resp, err := stream.CloseAndRecv()
 	if err != nil {
+		slog.Warn("Ошибка при закрытии стрима к микросервису Images", "error", err)
 		return "", err
 	}
 
 	if resp.Error != "" {
-		return "", SaveImageError{
+		err := SaveImageError{
 			Message:           resp.Error,
 			CountStoragePaths: len(resp.StoragePath),
 		}
+		slog.Warn("Ошибка при закрытии стрима к микросервису Images", "error", err)
+		return "", err
 	}
 
 	if len(resp.StoragePath) == 0 {
-		return "", SaveImageError{
+		err := SaveImageError{
 			Message:           resp.Error,
 			CountStoragePaths: len(resp.StoragePath),
 		}
+		slog.Warn("Ошибка при закрытии стрима к микросервису Images", "error", err)
+		return "", err
 	}
 
 	return strings.Replace(resp.StoragePath[len(resp.StoragePath)-1], "./files/", "", 1), nil

@@ -1,6 +1,7 @@
 package announcements
 
 import (
+	"log/slog"
 	"os"
 	pb "project-farm/internal/announcements/proto"
 	"sync"
@@ -30,6 +31,7 @@ func initService() error {
 
 	conn, err := grpc.NewClient(announcementsServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
+		slog.Error("Не удалось создать подключение к микросервису Announcements", "error", err)
 		return err
 	}
 

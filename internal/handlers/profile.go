@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -122,7 +122,7 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		err := embedding.InsertEmbedding(h.DB, userID, interests, "UPDATE users SET embedding = $1::float8[] WHERE user_id = $1")
 		if err != nil {
-			fmt.Println(err.Error())
+			slog.Error("Ошибка при создании и вставки эмбеддинга для пользователя", "error", err)
 		}
 	}()
 

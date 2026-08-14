@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -66,22 +66,22 @@ func main() {
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("Не удалось завершить работу обработчика запросов", "error", err)
 	}
 
 	if err := images.CloseConnectionToService(); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("Не удалось разоврвать соединение с микросервисом Images", "error", err)
 	}
 
 	if err := announcements.CloseConnectionToService(); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("Не удалось разоврвать соединение с микросервисом Announcements", "error", err)
 	}
 
 	if err := messenger.CloseConnectionToService(); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("Не удалось разоврвать соединение с микросервисом Messenger", "error", err)
 	}
 
 	if err := hand.DB.Close(); err != nil {
-		fmt.Println(err.Error())
+		slog.Error("Не удалось разоврвать соединение с базой данных", "error", err)
 	}
 }

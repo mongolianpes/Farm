@@ -1,10 +1,12 @@
 package messenger
 
 import (
+	"log/slog"
 	"os"
-	pb "project-farm/internal/messenger/proto"
 	"sync"
 	"time"
+
+	pb "project-farm/internal/messenger/proto"
 
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -31,6 +33,7 @@ func initService() error {
 
 	conn, err := grpc.NewClient(messengerServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
+		slog.Error("Не удалось создать подключение к микросервису Announcements", "error", err)
 		return err
 	}
 

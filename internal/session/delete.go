@@ -2,7 +2,7 @@ package session
 
 import (
 	"database/sql"
-	"fmt"
+	"log/slog"
 	"time"
 )
 
@@ -11,7 +11,7 @@ const sqlQueryToDeleteOldSessions = "DELETE FROM sessions WHERE NOW() - create_a
 func OldSessionsRemover(db *sql.DB) {
 	for {
 		if _, err := db.Exec(sqlQueryToDeleteOldSessions); err != nil {
-			fmt.Println(err.Error())
+			slog.Error("Ошибка при совершении запроса для удаления старых сессий")
 		}
 		time.Sleep(time.Hour * 24)
 	}

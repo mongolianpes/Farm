@@ -3,6 +3,7 @@ package announcements
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"strconv"
 
 	pb "project-farm/internal/announcements/proto"
@@ -29,6 +30,7 @@ func SearchAnnouncements(offset, announcementID int, userID, SearchString, categ
 
 	stream, err := client.service.SearchAnnouncements(ctx)
 	if err != nil {
+		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
 		return []*AnnouncementData{}, err
 	}
 
@@ -43,14 +45,17 @@ func SearchAnnouncements(offset, announcementID int, userID, SearchString, categ
 	}
 
 	if err := stream.Send(req); err != nil {
+		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
 		return []*AnnouncementData{}, err
 	}
 
 	resp, err := stream.CloseAndRecv()
 	if err != nil {
+		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
 		return []*AnnouncementData{}, err
 	}
 	if resp.Error != "" {
+		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
 		return []*AnnouncementData{}, errors.New(resp.Error)
 	}
 
@@ -81,6 +86,7 @@ func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
 
 	stream, err := client.service.SearchAnnouncements(ctx)
 	if err != nil {
+		slog.Warn("Не удалось получить информацию по объявлению", "error", err)
 		return AnnouncementData{}, err
 	}
 

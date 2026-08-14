@@ -3,6 +3,7 @@ package messenger
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	pb "project-farm/internal/messenger/proto"
@@ -23,6 +24,7 @@ func SendMessege(senderID, receivedID, relatedAnnouncementID int, messageText st
 		Text:                  messageText,
 	})
 	if err != nil {
+		slog.Warn("Ошибка при отправке сообщения во внутрененм мессенджере", "receivedID", receivedID, "senderID", senderID)
 		return err
 	}
 
@@ -48,6 +50,7 @@ func GetUserChats(userID int) ([]*ChatInfo, error) {
 		UserID: int32(userID),
 	})
 	if err != nil {
+		slog.Warn("Ошибка при получении чатов пользователей", "error", err)
 		return nil, err
 	}
 
@@ -85,6 +88,7 @@ func GetChatHistory(userID, partnerID, relatedAnnouncementID, offset int) ([]*me
 		Offset:                int32(offset),
 	})
 	if err != nil {
+		slog.Warn("Ошибка при получении истории чата", "error", err)
 		return nil, err
 	}
 

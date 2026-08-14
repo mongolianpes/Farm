@@ -3,6 +3,7 @@ package session
 import (
 	"database/sql"
 	"errors"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -18,6 +19,7 @@ func GetUserID(db *sql.DB, w http.ResponseWriter, r *http.Request) (int, error) 
 	if err := db.QueryRow("SELECT user_id, create_at FROM sessions WHERE session_id = $1", cookie.Value).Scan(&userID, &createAt); err != nil {
 		switch err {
 		case sql.ErrNoRows:
+			slog.Warn("Попытка аутентификации по не существующей ID сесии", "sessionID", cookie.Value, "userIP", r.RemoteAddr)
 			return userID, errors.New("Не имеется текущей ID сессии в БД")
 		default:
 			return userID, errors.New("Внутреняя ошибка БД, попробуйте позже")
@@ -42,6 +44,7 @@ func GetUserIDStr(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, e
 	if err := db.QueryRow("SELECT user_id, create_at FROM sessions WHERE session_id = $1", cookie.Value).Scan(&userID, &createAt); err != nil {
 		switch err {
 		case sql.ErrNoRows:
+			slog.Warn("Попытка аутентификации по не существующей ID сесии", "sessionID", cookie.Value, "userIP", r.RemoteAddr)
 			return userID, errors.New("Не имеется текущей ID сессии в БД")
 		default:
 			return userID, errors.New("Внутреняя ошибка БД, попробуйте позже")

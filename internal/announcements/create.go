@@ -3,6 +3,7 @@ package announcements
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"mime/multipart"
 
 	pb "project-farm/internal/announcements/proto"
@@ -36,16 +37,20 @@ func CreateAnnouncement(userID int, title, description, category, authorID strin
 
 	announcementID, err := sendReqCreateAnnouncement(title, description, category, authorID)
 	if err != nil {
+		slog.Warn("Не удалось создать объявление", "announcementID", announcementID, "userID", userID, "error", err)
 		return err
 	}
 
 	if len(images) >= 1 {
 		if err := sendReqAddImages(images, announcementID, int32(userID)); err != nil {
+			slog.Warn("Не удалось создать объявление, поскольку не удалось загрузить картинки", "announcementID", announcementID, "userID", userID, "error", err)
 			return err
 		}
 	}
 
-	return err
+	slog.Warn("Успешно создано объявление", "announcementID", announcementID, "userID", userID)
+
+	return nil
 }
 
 func sendReqCreateAnnouncement(title, description, category, authorID string) (int32, error) {
@@ -108,6 +113,7 @@ func sendReqAddImages(images []*multipart.FileHeader, announcementdID, userID in
 		return err
 	}
 	if respAddImages.Error != "" {
+		DeleteAnnouncement(int(announcementdID), int(userID))
 		return errors.New(respAddImages.Error)
 	}
 

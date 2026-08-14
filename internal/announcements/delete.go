@@ -3,6 +3,7 @@ package announcements
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	pb "project-farm/internal/announcements/proto"
 )
@@ -13,9 +14,11 @@ func DeleteAnnouncement(announcementID, userID int) error {
 	}
 
 	if err := sendReqDeleteAnnouncement(announcementID, userID); err != nil {
+		slog.Warn("Не удалось удалить объявления", "announcementID", announcementID, "userID", userID, "error", err)
 		return err
 	}
 
+	slog.Warn("Успешное удаление объявления", "announcementID", announcementID, "userID", userID)
 	return nil
 }
 
