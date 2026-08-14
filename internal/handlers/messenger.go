@@ -50,6 +50,7 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 		pageData.PartnerID, err = strconv.Atoi(partnerID)
 		if err != nil {
 			http.Error(w, "Неверный partnerID", http.StatusBadRequest)
+			return
 		}
 
 		if err := h.DB.QueryRow("SELECT name, avatar_path FROM users WHERE user_id = $1", partnerID).Scan(&pageData.Name, &pageData.PartnerAvatar); err != nil {

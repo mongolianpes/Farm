@@ -9,17 +9,52 @@ import (
 	imagesService "project-farm/internal/images"
 )
 
-func CreateAnnouncement(title, description, category, authorID string, images []*multipart.FileHeader) error {
+const maxImagesSize5MB = 5 * 1024 * 1024
+
+func CreateAnnouncement(userID int, title, description, category, authorID string, images []*multipart.FileHeader) error {
 	if err := initService(); err != nil {
 		return errors.New("Попробуйте создать чуть позже")
 	}
 
+	if category == "" || title == "" || description == "" {
+		return errors.New("Введите информацию во всех полях")
+	}
+
+	if len(description) > 100 || len(title) > 10 {
+		return errors.New("Название должно быть не больше 10 символов, а описание не больше 100")
+	}
+
+	if len(images) > 10 {
+		return errors.New("Можно загрузить до 10 изображений")
+	}
+
+	for _, image := range images {
+		if image.Size > maxImagesSize5MB {
+			return errors.New("Одно из картинок весом больше 5 MB")
+		}
+	}
+
+	announcementID, err := sendReqCreateAnnouncement(title, description, category, authorID)
+	if err != nil {
+		return err
+	}
+
+	if len(images) >= 1 {
+		if err := sendReqAddImages(images, announcementID, int32(userID)); err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+func sendReqCreateAnnouncement(title, description, category, authorID string) (int32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
 	streamCreate, err := client.service.CreateAnnouncement(ctx)
 	if err != nil {
-		return errors.New("Попробуйте создать чуть позже")
+		return 0, errors.New("Попробуйте создать чуть позже")
 	}
 
 	req := &pb.CreateAnnouncementRequest{
@@ -30,45 +65,50 @@ func CreateAnnouncement(title, description, category, authorID string, images []
 	}
 
 	if err := streamCreate.Send(req); err != nil {
-		return errors.New("Попробуйте создать чуть позже")
+		return 0, errors.New("Попробуйте создать чуть позже")
 	}
 
 	respCreate, err := streamCreate.CloseAndRecv()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if respCreate.Error != "" {
-		return errors.New(respCreate.Error)
+		return 0, errors.New(respCreate.Error)
 	}
 
-	if len(images) >= 1 {
-		imagesPath, err := saveImages(images)
-		if err != nil {
-			DeleteAnnouncement(int(respCreate.AnnouncementID))
-			return err
-		}
+	return respCreate.AnnouncementID, nil
+}
 
-		streamAddImages, err := client.service.AddImages(ctx)
-		if err != nil {
-			DeleteAnnouncement(int(respCreate.AnnouncementID))
-			return err
-		}
+func sendReqAddImages(images []*multipart.FileHeader, announcementdID, userID int32) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
 
-		if err := streamAddImages.Send(&pb.AddImagesRequest{
-			ImagesPath:     imagesPath,
-			AnnouncementID: respCreate.AnnouncementID,
-		}); err != nil {
-			return err
-		}
+	imagesPath, err := saveImages(images)
+	if err != nil {
+		DeleteAnnouncement(int(announcementdID), int(userID))
+		return err
+	}
 
-		respAddImages, err := streamAddImages.CloseAndRecv()
-		if err != nil {
-			DeleteAnnouncement(int(respCreate.AnnouncementID))
-			return err
-		}
-		if respAddImages.Error != "" {
-			return errors.New(respAddImages.Error)
-		}
+	streamAddImages, err := client.service.AddImages(ctx)
+	if err != nil {
+		DeleteAnnouncement(int(announcementdID), int(userID))
+		return err
+	}
+
+	if err := streamAddImages.Send(&pb.AddImagesRequest{
+		ImagesPath:     imagesPath,
+		AnnouncementID: announcementdID,
+	}); err != nil {
+		return err
+	}
+
+	respAddImages, err := streamAddImages.CloseAndRecv()
+	if err != nil {
+		DeleteAnnouncement(int(announcementdID), int(userID))
+		return err
+	}
+	if respAddImages.Error != "" {
+		return errors.New(respAddImages.Error)
 	}
 
 	return nil
