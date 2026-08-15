@@ -81,7 +81,7 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	data, err = announcements.SearchAnnouncements(offsetInt, 0, userID, searchString, category, orderBy, authorID)
+	data, err = announcements.SearchAnnouncements(offsetInt, userID, searchString, category, orderBy, authorID)
 	if err != nil {
 		return data, err
 	}

@@ -20,7 +20,7 @@ type AnnouncementData struct {
 	Images             []string
 }
 
-func SearchAnnouncements(offset, announcementID int, userID, SearchString, category, orderBy, authorID string) ([]*AnnouncementData, error) {
+func SearchAnnouncements(offset int, userID, SearchString, category, orderBy, authorID string) ([]*AnnouncementData, error) {
 	if err := initService(); err != nil {
 		return []*AnnouncementData{}, err
 	}
@@ -28,35 +28,17 @@ func SearchAnnouncements(offset, announcementID int, userID, SearchString, categ
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
-	stream, err := client.service.SearchAnnouncements(ctx)
+	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
+		Offset:       int32(offset),
+		UserID:       userID,
+		SearchString: SearchString,
+		Category:     category,
+		Orderby:      orderBy,
+		AuthorID:     authorID,
+	})
 	if err != nil {
-		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
-		return []*AnnouncementData{}, err
-	}
-
-	req := &pb.SearchAnnouncementsRequest{
-		Offset:         int32(offset),
-		UserID:         userID,
-		SearchString:   SearchString,
-		Category:       category,
-		Orderby:        orderBy,
-		AnnouncementID: int32(announcementID),
-		AuthorID:       authorID,
-	}
-
-	if err := stream.Send(req); err != nil {
-		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
-		return []*AnnouncementData{}, err
-	}
-
-	resp, err := stream.CloseAndRecv()
-	if err != nil {
-		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
-		return []*AnnouncementData{}, err
-	}
-	if resp.Error != "" {
-		slog.Warn("Не удалось выполнить поиск по обявлениям", "error", err)
-		return []*AnnouncementData{}, errors.New(resp.Error)
+		slog.Warn("Не удалось получить список объявлений", "error", err)
+		return nil, err
 	}
 
 	result := []*AnnouncementData{}
@@ -84,27 +66,13 @@ func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
-	stream, err := client.service.SearchAnnouncements(ctx)
-	if err != nil {
-		slog.Warn("Не удалось получить информацию по объявлению", "error", err)
-		return AnnouncementData{}, err
-	}
-
-	req := &pb.SearchAnnouncementsRequest{
+	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
 		AnnouncementID: int32(announcementID),
 		UserID:         strconv.Itoa(userID),
-	}
-
-	if err := stream.Send(req); err != nil {
-		return AnnouncementData{}, err
-	}
-
-	resp, err := stream.CloseAndRecv()
+	})
 	if err != nil {
+		slog.Warn("Не удалось получить объявление", "announcementID", announcementID, "userID", userID, "error", err)
 		return AnnouncementData{}, err
-	}
-	if resp.Error != "" {
-		return AnnouncementData{}, errors.New(resp.Error)
 	}
 
 	for _, announcement := range resp.AnnouncementsData {
