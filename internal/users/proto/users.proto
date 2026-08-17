@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package profile;
+
+option go_package=".";
+
+message GetUserInfoRequest {
+    string userLogin = 1;
+}
+
+message GetUserInfoResponse {
+    string name = 1;
+    string avatarPath = 2;
+    int32 userID = 3;
+}
+
+message AuthRequest {
+    string login = 1;
+    string password = 2;
+}
+
+message AuthResponse {
+    int32 userID = 1;
+    string userName = 2;
+    string avatarPath = 3;
+}
+
+message RegisterRequest {
+    string login = 1;
+    string name = 2;
+    string password = 3;
+    string interests = 4;
+}
+
+message RegisterResponse {}
+
+message AddAvatarRequest {
+    string avatarPath = 1;
+    int32 userID = 2;
+}
+
+message AddAvatarResponse {}
+
+service Users {
+    rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
+    rpc Auth(AuthRequest) returns (AuthResponse);
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc AddAvatar(AddAvatarRequest) returns (AddAvatarResponse);
+}

@@ -41,5 +41,8 @@ func initService() error {
 }
 
 func CloseConnectionToService() error {
+	if client.conn == nil {
+		return nil
+	}
 	return client.conn.Close()
 }

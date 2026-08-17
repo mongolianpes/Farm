@@ -14,6 +14,7 @@ import (
 	"project-farm/internal/images"
 	"project-farm/internal/messenger"
 	"project-farm/internal/session"
+	"project-farm/internal/users"
 )
 
 const (
@@ -79,6 +80,10 @@ func main() {
 
 	if err := messenger.CloseConnectionToService(); err != nil {
 		slog.Error("Не удалось разоврвать соединение с микросервисом Messenger", "error", err)
+	}
+
+	if err := users.CloseConnectionToService(); err != nil {
+		slog.Error("Не удалось разорвать соединение с микросервисом Users", "error", err)
 	}
 
 	if err := hand.DB.Close(); err != nil {

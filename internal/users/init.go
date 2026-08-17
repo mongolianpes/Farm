@@ -1,4 +1,4 @@
-package messenger
+package users
 
 import (
 	"log/slog"
@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	pb "project-farm/internal/messenger/proto"
+	pb "project-farm/internal/users/proto"
 
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -15,14 +15,14 @@ import (
 
 const timeToCompleteRequest = 30 * time.Second
 
-type messengerClient struct {
+type usersClient struct {
 	sync.Mutex
-	service pb.MessengerClient
+	service pb.UsersClient
 	conn    *grpc.ClientConn
 }
 
-var client messengerClient
-var messengerServiceHost = os.Getenv("MESSENGER_SERVICE_HOST_GRPC_PORT")
+var client usersClient
+var usersServiceHost = os.Getenv("USERS_SERVICE_HOST_GRPC_PORT")
 
 func initService() error {
 	client.Lock()
@@ -31,13 +31,13 @@ func initService() error {
 		return nil
 	}
 
-	conn, err := grpc.NewClient(messengerServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(usersServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		slog.Error("Не удалось создать подключение к микросервису Announcements", "error", err)
+		slog.Error("Не удалось создать подключение к микросервису Users", "error", err)
 		return err
 	}
 
-	client.service = pb.NewMessengerClient(conn)
+	client.service = pb.NewUsersClient(conn)
 	client.conn = conn
 	return nil
 }
