@@ -307,6 +307,7 @@ func (x *RegisterRequest) GetInterests() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserID        int32                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -339,6 +340,13 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RegisterResponse) GetUserID() int32 {
+	if x != nil {
+		return x.UserID
+	}
+	return 0
 }
 
 type AddAvatarRequest struct {
@@ -455,8 +463,9 @@ const file_users_proto_rawDesc = "" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x1c\n" +
-	"\tinterests\x18\x04 \x01(\tR\tinterests\"\x12\n" +
-	"\x10RegisterResponse\"J\n" +
+	"\tinterests\x18\x04 \x01(\tR\tinterests\"*\n" +
+	"\x10RegisterResponse\x12\x16\n" +
+	"\x06userID\x18\x01 \x01(\x05R\x06userID\"J\n" +
 	"\x10AddAvatarRequest\x12\x1e\n" +
 	"\n" +
 	"avatarPath\x18\x01 \x01(\tR\n" +
