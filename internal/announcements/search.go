@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"strconv"
 
 	pb "project-farm/internal/announcements/proto"
 )
@@ -20,7 +19,7 @@ type AnnouncementData struct {
 	Images             []string
 }
 
-func SearchAnnouncements(offset int, userID, SearchString, category, orderBy, authorID string) ([]*AnnouncementData, error) {
+func SearchAnnouncements(offset, userID int, SearchString, category, orderBy, authorID string) ([]*AnnouncementData, error) {
 	if err := initService(); err != nil {
 		return []*AnnouncementData{}, err
 	}
@@ -30,7 +29,7 @@ func SearchAnnouncements(offset int, userID, SearchString, category, orderBy, au
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
 		Offset:       int32(offset),
-		UserID:       userID,
+		UserID:       int32(userID),
 		SearchString: SearchString,
 		Category:     category,
 		Orderby:      orderBy,
@@ -68,7 +67,7 @@ func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
 		AnnouncementID: int32(announcementID),
-		UserID:         strconv.Itoa(userID),
+		UserID:         int32(userID),
 	})
 	if err != nil {
 		slog.Warn("Не удалось получить объявление", "announcementID", announcementID, "userID", userID, "error", err)

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -50,20 +49,16 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 		}
 	}
 
+	var userIDInt int
 	userID := r.URL.Query().Get("userid")
 	if userID == "" {
 		if login := r.URL.Query().Get("login"); login != "" {
-			userIDInt, err := users.GetUserID(login)
-			if err != nil {
-				return data, err
-			}
-			userID = strconv.Itoa(userIDInt)
+			userIDInt, _ = users.GetUserID(login)
 		} else {
-			userID, err = session.GetUserIDStr(db, w, r)
-			if err != nil {
-				return data, errors.New("User have not session")
-			}
+			userID, _ = session.GetUserIDStr(db, w, r)
 		}
+	} else {
+		userIDInt, _ = strconv.Atoi(userID)
 	}
 
 	searchString := r.URL.Query().Get("search")
@@ -82,7 +77,7 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	data, err = announcements.SearchAnnouncements(offsetInt, userID, searchString, category, orderBy, authorID)
+	data, err = announcements.SearchAnnouncements(offsetInt, userIDInt, searchString, category, orderBy, authorID)
 	if err != nil {
 		return data, err
 	}
