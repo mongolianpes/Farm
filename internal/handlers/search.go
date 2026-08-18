@@ -49,7 +49,7 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	var userIDInt int
+	userIDInt := 0
 	userID := r.URL.Query().Get("userid")
 	if userID == "" {
 		if login := r.URL.Query().Get("login"); login != "" {
