@@ -2,6 +2,7 @@ package users
 
 import (
 	"log/slog"
+	"os"
 	"sync"
 	"time"
 
@@ -22,8 +23,7 @@ type usersClient struct {
 
 var client usersClient
 
-// var usersServiceHost = os.Getenv("USERS_SERVICE_HOST_GRPC_PORT")
-var usersServiceHost = "localhost:8086"
+var usersServiceHost = os.Getenv("USERS_SERVICE_HOST_GRPC_PORT")
 
 func initService() error {
 	client.Lock()

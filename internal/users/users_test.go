@@ -129,7 +129,7 @@ func TestAuthUser(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if result.name != "1" {
+	if result.Name != "1" {
 		t.Error("Вернул чужое имя")
 	}
 	if result.ID != users.ids[0] {
@@ -153,7 +153,7 @@ func TestGetUserInfo(t *testing.T) {
 		t.Error(err)
 	}
 
-	result, err := GetUserInfo("11")
+	result, err := GetUserInfo(0, "11")
 	if err != nil {
 		t.Error(err)
 	}
@@ -161,7 +161,42 @@ func TestGetUserInfo(t *testing.T) {
 	if result.ID != users.ids[0] {
 		t.Error("Функция вернула чужой ID")
 	}
-	if result.name != "1" {
+	if result.Name != "1" {
 		t.Error("Функция вернула чужое имя")
+	}
+
+	result, err = GetUserInfo(users.ids[0], "")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if result.ID != users.ids[0] {
+		t.Error("Функция вернула чужой ID")
+	}
+	if result.Name != "1" {
+		t.Error("Функция вернула чужое имя")
+	}
+
+	result, err = GetUserInfo(0, "")
+	if err == nil {
+		t.Error("Функция не вернула ошибку при отправке пустого логина и 0 ID")
+	}
+}
+
+func TestGetUserID(t *testing.T) {
+	usersServiceHost = "localhost:8086"
+	db := connectToDBForTest()
+	users, err := updateTestUsers(db)
+	if err != nil {
+		t.Error(err)
+	}
+
+	userID, err := GetUserID("11")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if userID != users.ids[0] {
+		t.Error("Вернул чужой userID")
 	}
 }

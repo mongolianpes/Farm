@@ -6,12 +6,14 @@ option go_package = ".";
 
 message GetUserInfoRequest {
   string userLogin = 1;
+  int32 userID = 2;
 }
 
 message GetUserInfoResponse {
   string name = 1;
   string avatarPath = 2;
   int32 userID = 3;
+  string login = 4;
 }
 
 message AuthRequest {
@@ -43,9 +45,25 @@ message AddAvatarRequest {
 
 message AddAvatarResponse {}
 
+message DeleteUserRequest {
+  int32 userID = 1;
+}
+
+message DeleteUserResponse {}
+
+message GetUserIDRequest {
+  string login = 1;
+}
+
+message GetUserIDResponse {
+  int32 ID = 1;
+}
+
 service Users {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
   rpc Auth(AuthRequest) returns (AuthResponse);
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc AddAvatar(AddAvatarRequest) returns (AddAvatarResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc GetUserID(GetUserIDRequest) returns (GetUserIDResponse);
 }

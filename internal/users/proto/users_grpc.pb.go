@@ -23,6 +23,8 @@ const (
 	Users_Auth_FullMethodName        = "/profile.Users/Auth"
 	Users_Register_FullMethodName    = "/profile.Users/Register"
 	Users_AddAvatar_FullMethodName   = "/profile.Users/AddAvatar"
+	Users_DeleteUser_FullMethodName  = "/profile.Users/DeleteUser"
+	Users_GetUserID_FullMethodName   = "/profile.Users/GetUserID"
 )
 
 // UsersClient is the client API for Users service.
@@ -33,6 +35,8 @@ type UsersClient interface {
 	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	AddAvatar(ctx context.Context, in *AddAvatarRequest, opts ...grpc.CallOption) (*AddAvatarResponse, error)
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
+	GetUserID(ctx context.Context, in *GetUserIDRequest, opts ...grpc.CallOption) (*GetUserIDResponse, error)
 }
 
 type usersClient struct {
@@ -83,6 +87,26 @@ func (c *usersClient) AddAvatar(ctx context.Context, in *AddAvatarRequest, opts 
 	return out, nil
 }
 
+func (c *usersClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteUserResponse)
+	err := c.cc.Invoke(ctx, Users_DeleteUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersClient) GetUserID(ctx context.Context, in *GetUserIDRequest, opts ...grpc.CallOption) (*GetUserIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserIDResponse)
+	err := c.cc.Invoke(ctx, Users_GetUserID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServer is the server API for Users service.
 // All implementations must embed UnimplementedUsersServer
 // for forward compatibility.
@@ -91,6 +115,8 @@ type UsersServer interface {
 	Auth(context.Context, *AuthRequest) (*AuthResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	AddAvatar(context.Context, *AddAvatarRequest) (*AddAvatarResponse, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
+	GetUserID(context.Context, *GetUserIDRequest) (*GetUserIDResponse, error)
 	mustEmbedUnimplementedUsersServer()
 }
 
@@ -112,6 +138,12 @@ func (UnimplementedUsersServer) Register(context.Context, *RegisterRequest) (*Re
 }
 func (UnimplementedUsersServer) AddAvatar(context.Context, *AddAvatarRequest) (*AddAvatarResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddAvatar not implemented")
+}
+func (UnimplementedUsersServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUsersServer) GetUserID(context.Context, *GetUserIDRequest) (*GetUserIDResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUserID not implemented")
 }
 func (UnimplementedUsersServer) mustEmbedUnimplementedUsersServer() {}
 func (UnimplementedUsersServer) testEmbeddedByValue()               {}
@@ -206,6 +238,42 @@ func _Users_AddAvatar_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Users_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_DeleteUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).DeleteUser(ctx, req.(*DeleteUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Users_GetUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServer).GetUserID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Users_GetUserID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServer).GetUserID(ctx, req.(*GetUserIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Users_ServiceDesc is the grpc.ServiceDesc for Users service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +296,14 @@ var Users_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddAvatar",
 			Handler:    _Users_AddAvatar_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _Users_DeleteUser_Handler,
+		},
+		{
+			MethodName: "GetUserID",
+			Handler:    _Users_GetUserID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

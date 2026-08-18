@@ -8,6 +8,7 @@ import (
 
 	"project-farm/internal/announcements"
 	"project-farm/internal/session"
+	"project-farm/internal/users"
 )
 
 func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +53,7 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 	userID := r.URL.Query().Get("userid")
 	if userID == "" {
 		if login := r.URL.Query().Get("login"); login != "" {
-			userIDInt, err := getUserIDByLogin(db, w, r)
+			userIDInt, err := users.GetUserID(login)
 			if err != nil {
 				return data, err
 			}
@@ -87,14 +88,4 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 	}
 
 	return data, nil
-}
-
-func getUserIDByLogin(db *sql.DB, w http.ResponseWriter, r *http.Request) (userID int, err error) {
-	login := r.URL.Query().Get("login")
-	if login == myLoginAlias {
-		userID, err = session.GetUserID(db, w, r)
-	} else {
-		err = db.QueryRow("SELECT user_id FROM users WHERE login = $1", login).Scan(&userID)
-	}
-	return
 }
