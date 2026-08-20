@@ -6,12 +6,17 @@ import (
 	"html/template"
 	"os"
 	"time"
+
+	"project-farm/internal/messenger"
 )
 
 type Handler struct {
-	Tmpl *template.Template
-	DB   *sql.DB
+	Tmpl      *template.Template
+	DB        *sql.DB
+	Messenger *messenger.Client
 }
+
+const timeToCompleteRequest = 30 * time.Second
 
 const htmlPages = "./htmlPages/*.html"
 
@@ -49,8 +54,14 @@ func NewHand() *Handler {
 		panic(err)
 	}
 
+	messenger, err := messenger.NewClient()
+	if err != nil {
+		panic(err)
+	}
+
 	return &Handler{
-		Tmpl: tmpl,
-		DB:   db,
+		Tmpl:      tmpl,
+		DB:        db,
+		Messenger: messenger,
 	}
 }

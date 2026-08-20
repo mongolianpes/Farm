@@ -625,7 +625,7 @@ var File_users_proto protoreflect.FileDescriptor
 
 const file_users_proto_rawDesc = "" +
 	"\n" +
-	"\vusers.proto\x12\aprofile\"J\n" +
+	"\vusers.proto\x12\x05users\"J\n" +
 	"\x12GetUserInfoRequest\x12\x1c\n" +
 	"\tuserLogin\x18\x01 \x01(\tR\tuserLogin\x12\x16\n" +
 	"\x06userID\x18\x02 \x01(\x05R\x06userID\"w\n" +
@@ -664,15 +664,15 @@ const file_users_proto_rawDesc = "" +
 	"\x10GetUserIDRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\"#\n" +
 	"\x11GetUserIDResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\x05R\x02ID2\x96\x03\n" +
-	"\x05Users\x12H\n" +
-	"\vGetUserInfo\x12\x1b.profile.GetUserInfoRequest\x1a\x1c.profile.GetUserInfoResponse\x123\n" +
-	"\x04Auth\x12\x14.profile.AuthRequest\x1a\x15.profile.AuthResponse\x12?\n" +
-	"\bRegister\x12\x18.profile.RegisterRequest\x1a\x19.profile.RegisterResponse\x12B\n" +
-	"\tAddAvatar\x12\x19.profile.AddAvatarRequest\x1a\x1a.profile.AddAvatarResponse\x12E\n" +
+	"\x02ID\x18\x01 \x01(\x05R\x02ID2\xfe\x02\n" +
+	"\x05Users\x12D\n" +
+	"\vGetUserInfo\x12\x19.users.GetUserInfoRequest\x1a\x1a.users.GetUserInfoResponse\x12/\n" +
+	"\x04Auth\x12\x12.users.AuthRequest\x1a\x13.users.AuthResponse\x12;\n" +
+	"\bRegister\x12\x16.users.RegisterRequest\x1a\x17.users.RegisterResponse\x12>\n" +
+	"\tAddAvatar\x12\x17.users.AddAvatarRequest\x1a\x18.users.AddAvatarResponse\x12A\n" +
 	"\n" +
-	"DeleteUser\x12\x1a.profile.DeleteUserRequest\x1a\x1b.profile.DeleteUserResponse\x12B\n" +
-	"\tGetUserID\x12\x19.profile.GetUserIDRequest\x1a\x1a.profile.GetUserIDResponseB\x03Z\x01.b\x06proto3"
+	"DeleteUser\x12\x18.users.DeleteUserRequest\x1a\x19.users.DeleteUserResponse\x12>\n" +
+	"\tGetUserID\x12\x17.users.GetUserIDRequest\x1a\x18.users.GetUserIDResponseB\x03Z\x01.b\x06proto3"
 
 var (
 	file_users_proto_rawDescOnce sync.Once
@@ -688,32 +688,32 @@ func file_users_proto_rawDescGZIP() []byte {
 
 var file_users_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_users_proto_goTypes = []any{
-	(*GetUserInfoRequest)(nil),  // 0: profile.GetUserInfoRequest
-	(*GetUserInfoResponse)(nil), // 1: profile.GetUserInfoResponse
-	(*AuthRequest)(nil),         // 2: profile.AuthRequest
-	(*AuthResponse)(nil),        // 3: profile.AuthResponse
-	(*RegisterRequest)(nil),     // 4: profile.RegisterRequest
-	(*RegisterResponse)(nil),    // 5: profile.RegisterResponse
-	(*AddAvatarRequest)(nil),    // 6: profile.AddAvatarRequest
-	(*AddAvatarResponse)(nil),   // 7: profile.AddAvatarResponse
-	(*DeleteUserRequest)(nil),   // 8: profile.DeleteUserRequest
-	(*DeleteUserResponse)(nil),  // 9: profile.DeleteUserResponse
-	(*GetUserIDRequest)(nil),    // 10: profile.GetUserIDRequest
-	(*GetUserIDResponse)(nil),   // 11: profile.GetUserIDResponse
+	(*GetUserInfoRequest)(nil),  // 0: users.GetUserInfoRequest
+	(*GetUserInfoResponse)(nil), // 1: users.GetUserInfoResponse
+	(*AuthRequest)(nil),         // 2: users.AuthRequest
+	(*AuthResponse)(nil),        // 3: users.AuthResponse
+	(*RegisterRequest)(nil),     // 4: users.RegisterRequest
+	(*RegisterResponse)(nil),    // 5: users.RegisterResponse
+	(*AddAvatarRequest)(nil),    // 6: users.AddAvatarRequest
+	(*AddAvatarResponse)(nil),   // 7: users.AddAvatarResponse
+	(*DeleteUserRequest)(nil),   // 8: users.DeleteUserRequest
+	(*DeleteUserResponse)(nil),  // 9: users.DeleteUserResponse
+	(*GetUserIDRequest)(nil),    // 10: users.GetUserIDRequest
+	(*GetUserIDResponse)(nil),   // 11: users.GetUserIDResponse
 }
 var file_users_proto_depIdxs = []int32{
-	0,  // 0: profile.Users.GetUserInfo:input_type -> profile.GetUserInfoRequest
-	2,  // 1: profile.Users.Auth:input_type -> profile.AuthRequest
-	4,  // 2: profile.Users.Register:input_type -> profile.RegisterRequest
-	6,  // 3: profile.Users.AddAvatar:input_type -> profile.AddAvatarRequest
-	8,  // 4: profile.Users.DeleteUser:input_type -> profile.DeleteUserRequest
-	10, // 5: profile.Users.GetUserID:input_type -> profile.GetUserIDRequest
-	1,  // 6: profile.Users.GetUserInfo:output_type -> profile.GetUserInfoResponse
-	3,  // 7: profile.Users.Auth:output_type -> profile.AuthResponse
-	5,  // 8: profile.Users.Register:output_type -> profile.RegisterResponse
-	7,  // 9: profile.Users.AddAvatar:output_type -> profile.AddAvatarResponse
-	9,  // 10: profile.Users.DeleteUser:output_type -> profile.DeleteUserResponse
-	11, // 11: profile.Users.GetUserID:output_type -> profile.GetUserIDResponse
+	0,  // 0: users.Users.GetUserInfo:input_type -> users.GetUserInfoRequest
+	2,  // 1: users.Users.Auth:input_type -> users.AuthRequest
+	4,  // 2: users.Users.Register:input_type -> users.RegisterRequest
+	6,  // 3: users.Users.AddAvatar:input_type -> users.AddAvatarRequest
+	8,  // 4: users.Users.DeleteUser:input_type -> users.DeleteUserRequest
+	10, // 5: users.Users.GetUserID:input_type -> users.GetUserIDRequest
+	1,  // 6: users.Users.GetUserInfo:output_type -> users.GetUserInfoResponse
+	3,  // 7: users.Users.Auth:output_type -> users.AuthResponse
+	5,  // 8: users.Users.Register:output_type -> users.RegisterResponse
+	7,  // 9: users.Users.AddAvatar:output_type -> users.AddAvatarResponse
+	9,  // 10: users.Users.DeleteUser:output_type -> users.DeleteUserResponse
+	11, // 11: users.Users.GetUserID:output_type -> users.GetUserIDResponse
 	6,  // [6:12] is the sub-list for method output_type
 	0,  // [0:6] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name

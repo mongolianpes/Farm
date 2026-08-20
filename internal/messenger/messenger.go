@@ -9,15 +9,8 @@ import (
 	pb "project-farm/internal/messenger/proto"
 )
 
-func SendMessege(senderID, receivedID, relatedAnnouncementID int, messageText string) error {
-	if err := initService(); err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
-	defer cancel()
-
-	_, err := client.service.SendMessage(ctx, &pb.SendMessageRequest{
+func (c *Client) SendMessege(ctx context.Context, senderID, receivedID, relatedAnnouncementID int, messageText string) error {
+	_, err := c.service.SendMessage(ctx, &pb.SendMessageRequest{
 		ReceivedID:            int32(receivedID),
 		SenderID:              int32(senderID),
 		RelatedAnnouncementID: int32(relatedAnnouncementID),
@@ -38,15 +31,8 @@ type ChatInfo struct {
 	RelatedAnnouncementID int
 }
 
-func GetUserChats(userID int) ([]*ChatInfo, error) {
-	if err := initService(); err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
-	defer cancel()
-
-	resp, err := client.service.GetChats(ctx, &pb.GetChatsRequest{
+func (c *Client) GetUserChats(ctx context.Context, userID int) ([]*ChatInfo, error) {
+	resp, err := c.service.GetChats(ctx, &pb.GetChatsRequest{
 		UserID: int32(userID),
 	})
 	if err != nil {
@@ -73,15 +59,8 @@ type message struct {
 	CreateAt  time.Time
 }
 
-func GetChatHistory(userID, partnerID, relatedAnnouncementID, offset int) ([]*message, error) {
-	if err := initService(); err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
-	defer cancel()
-
-	resp, err := client.service.GetChatHistory(ctx, &pb.GetChatHistoryRequest{
+func (c *Client) GetChatHistory(ctx context.Context, userID, partnerID, relatedAnnouncementID, offset int) ([]*message, error) {
+	resp, err := c.service.GetChatHistory(ctx, &pb.GetChatHistoryRequest{
 		PartnerID:             int32(partnerID),
 		UserID:                int32(userID),
 		RelatedAnnouncementID: int32(relatedAnnouncementID),

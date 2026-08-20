@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -38,7 +39,10 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		chats, err := messenger.GetUserChats(userID)
+		ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+		defer cancel()
+
+		chats, err := h.Messenger.GetUserChats(ctx, userID)
 		if err != nil {
 			http.Error(w, "Ошибка при получении чатов", http.StatusInternalServerError)
 			return
@@ -89,7 +93,10 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := messenger.SendMessege(userID, sendMessage.ReceivedUsedID, sendMessage.RelatedAnnouncementID, sendMessage.Text); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	if err := h.Messenger.SendMessege(ctx, userID, sendMessage.ReceivedUsedID, sendMessage.RelatedAnnouncementID, sendMessage.Text); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -137,7 +144,10 @@ func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	chat, err := messenger.GetChatHistory(userID, partnerID, relatedAnnouncementID, offsetInt)
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	chat, err := h.Messenger.GetChatHistory(ctx, userID, partnerID, relatedAnnouncementID, offsetInt)
 	if err != nil {
 		http.Error(w, "Ошибка получения чата", http.StatusInternalServerError)
 		return

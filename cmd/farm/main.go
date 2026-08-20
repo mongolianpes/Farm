@@ -12,7 +12,6 @@ import (
 	"project-farm/internal/announcements"
 	"project-farm/internal/handlers"
 	"project-farm/internal/images"
-	"project-farm/internal/messenger"
 	"project-farm/internal/session"
 	"project-farm/internal/users"
 )
@@ -78,7 +77,7 @@ func main() {
 		slog.Error("Не удалось разоврвать соединение с микросервисом Announcements", "error", err)
 	}
 
-	if err := messenger.CloseConnectionToService(); err != nil {
+	if err := hand.Messenger.Close(); err != nil {
 		slog.Error("Не удалось разоврвать соединение с микросервисом Messenger", "error", err)
 	}
 

@@ -1,10 +1,9 @@
 package messenger
 
 import (
+	"context"
 	"log/slog"
 	"os"
-	"sync"
-	"time"
 
 	pb "project-farm/internal/messenger/proto"
 
@@ -13,38 +12,39 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const timeToCompleteRequest = 30 * time.Second
-
-type messengerClient struct {
-	sync.Mutex
+type Client struct {
 	service pb.MessengerClient
 	conn    *grpc.ClientConn
 }
 
-var client messengerClient
+type Messenger interface {
+	SendMessege(ctx context.Context, senderID, receivedID, relatedAnnouncementID int, messageText string) error
+	GetUserChats(ctx context.Context, userID int) ([]*ChatInfo, error)
+	GetChatHistory(ctx context.Context, userID, partnerID, relatedAnnouncementID, offset int) ([]*message, error)
+}
+
 var messengerServiceHost = os.Getenv("MESSENGER_SERVICE_HOST_GRPC_PORT")
 
-func initService() error {
-	client.Lock()
-	defer client.Unlock()
+func NewClient() (*Client, error) {
+	client := &Client{}
 	if client.service != nil {
-		return nil
+		return client, nil
 	}
 
 	conn, err := grpc.NewClient(messengerServiceHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		slog.Error("Не удалось создать подключение к микросервису Announcements", "error", err)
-		return err
+		return client, err
 	}
 
 	client.service = pb.NewMessengerClient(conn)
 	client.conn = conn
-	return nil
+	return client, nil
 }
 
-func CloseConnectionToService() error {
-	if client.conn == nil {
+func (c *Client) Close() error {
+	if c.conn == nil {
 		return nil
 	}
-	return client.conn.Close()
+	return c.conn.Close()
 }

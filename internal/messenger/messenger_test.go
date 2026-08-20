@@ -1,6 +1,7 @@
 package messenger
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"testing"
@@ -155,17 +156,26 @@ func connectToDBForTest() *sql.DB {
 func TestGetChatHistory(t *testing.T) {
 	db := connectToDBForTest()
 	messengerServiceHost = "localhost:8086"
+	timeToCompleteRequest := 30 * time.Second
 
 	updMessages, err := updateTestMessages(db)
 	if err != nil {
 		t.Error(err)
 	}
 
+	client, err := NewClient()
+	if err != nil {
+		t.Error(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
 	userID := updMessages.usersIDs[0]
 	partnerID := updMessages.usersIDs[1]
 	relatedAnnouncementID := updMessages.announcementsIDs[0]
 	offset := 0
-	chat, err := GetChatHistory(partnerID, userID, relatedAnnouncementID, offset)
+	chat, err := client.GetChatHistory(ctx, partnerID, userID, relatedAnnouncementID, offset)
 	if err != nil {
 		t.Error(err)
 	}
@@ -175,7 +185,7 @@ func TestGetChatHistory(t *testing.T) {
 	}
 
 	offset++
-	chat, err = GetChatHistory(partnerID, userID, relatedAnnouncementID, offset)
+	chat, err = client.GetChatHistory(ctx, partnerID, userID, relatedAnnouncementID, offset)
 	if err != nil {
 		t.Error(err)
 	}
@@ -184,7 +194,7 @@ func TestGetChatHistory(t *testing.T) {
 		t.Errorf("Количество полученных сообщений не соответствует нужному. Получено сообщений: %v, offset %v, userID %v, partnerID %v, relatedAnnouncementID %v", len(chat), offset, userID, partnerID, relatedAnnouncementID)
 	}
 
-	chat, err = GetChatHistory(userID, userID, relatedAnnouncementID, offset)
+	chat, err = client.GetChatHistory(ctx, userID, userID, relatedAnnouncementID, offset)
 	if err == nil {
 		t.Error("Получил историю чата с самим собой")
 	}
@@ -193,6 +203,7 @@ func TestGetChatHistory(t *testing.T) {
 func TestSendMessage(t *testing.T) {
 	db := connectToDBForTest()
 	messengerServiceHost = "localhost:8086"
+	timeToCompleteRequest := 30 * time.Second
 
 	updMessages, err := updateTestUsers(db)
 	if err != nil {
@@ -204,21 +215,29 @@ func TestSendMessage(t *testing.T) {
 		t.Error(err)
 	}
 
+	client, err := NewClient()
+	if err != nil {
+		t.Error(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
 	receivedID := updMessages.usersIDs[0]
 	senderID := updMessages.usersIDs[1]
 	relatedAnnouncementID := updMessages.announcementsIDs[0]
 	messegeText := "Это тестовое сообщение"
 	defer deleteTestMessage(db, messegeText)
 
-	if err := SendMessege(receivedID, senderID, relatedAnnouncementID, ""); err == nil {
+	if err := client.SendMessege(ctx, receivedID, senderID, relatedAnnouncementID, ""); err == nil {
 		t.Error("Получилось отправить пустое сообщение")
 	}
 
-	if err := SendMessege(senderID, senderID, relatedAnnouncementID, messegeText); err == nil {
+	if err := client.SendMessege(ctx, senderID, senderID, relatedAnnouncementID, messegeText); err == nil {
 		t.Error("Получилось отправить сообщение самому себе")
 	}
 
-	if err := SendMessege(senderID, receivedID, relatedAnnouncementID, messegeText); err != nil {
+	if err := client.SendMessege(ctx, senderID, receivedID, relatedAnnouncementID, messegeText); err != nil {
 		t.Error(err)
 	}
 
@@ -244,15 +263,24 @@ func TestSendMessage(t *testing.T) {
 func TestGetChats(t *testing.T) {
 	db := connectToDBForTest()
 	messengerServiceHost = "localhost:8086"
+	timeToCompleteRequest := 30 * time.Second
 
 	updMessages, err := updateTestMessages(db)
 	if err != nil {
 		t.Error(err)
 	}
 
+	client, err := NewClient()
+	if err != nil {
+		t.Error(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
 	userID := updMessages.usersIDs[0]
 
-	chats, err := GetUserChats(userID)
+	chats, err := client.GetUserChats(ctx, userID)
 	if err != nil {
 		t.Error(err)
 	}
