@@ -48,7 +48,14 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		pageData.Partners = append(pageData.Partners, chats...)
+		for _, chat := range chats {
+			pageData.Partners = append(pageData.Partners, &messenger.ChatInfo{
+				PartnerID:             chat.PartnerID,
+				PartnerName:           chat.PartnerName,
+				PartnerAvatarPath:     images.MakeCurrentPathToImage(chat.PartnerAvatarPath),
+				RelatedAnnouncementID: chat.RelatedAnnouncementID,
+			})
+		}
 	} else {
 		var err error
 		pageData.PartnerID, err = strconv.Atoi(partnerID)
