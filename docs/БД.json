@@ -1,0 +1,571 @@
+{
+  "version": "31.3.2",
+  "pages": [
+    {
+      "id": "5kGtSWDAojwzb6cK3JFA",
+      "name": "Страница-1",
+      "cells": [
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-1",
+          "type": "node",
+          "parent": "1",
+          "label": "announcements"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-2",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-3",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-2",
+          "label": "PK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-4",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-2",
+          "label": "announcement_id serail"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-5",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-6",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-5"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-7",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-5",
+          "label": "title varchar(10) NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-80",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-81",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-80"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-82",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-80",
+          "label": "description varchar(100) NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-84",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-85",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-84"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-86",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-84",
+          "label": "category announcement_category NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-76",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-77",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-76",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-78",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-76",
+          "label": "announcement_author_id int DELETE, UPDATE CASCADE"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-8",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-9",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-8"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-10",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-8",
+          "label": "create_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-11",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-12",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-11"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-13",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-11",
+          "label": "embedding vector(768)"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-88",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-1"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-89",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-88"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-90",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-88",
+          "label": "images_path text[] CHECK (cardinality(images_path) <= 10)\nDEFAULT '{}'::text[]"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-27",
+          "type": "node",
+          "parent": "1",
+          "label": "Sessions"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-28",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-27"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-29",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-28",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-30",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-28",
+          "label": "user_id int DELETE, UPDATE CASCASE"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-31",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-27"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-32",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-31"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-33",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-31",
+          "label": "session_id char(64) NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-34",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-27"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-35",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-34"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-36",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-34",
+          "label": "create_at timestamp NOT NULL\nDEFAULT CURRENT_TIMESTAMP",
+          "html": "create_at timestamp NOT NULL<div>DEFAULT CURRENT_TIMESTAMP</div>"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-37",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-27"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-38",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-37"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-39",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-37",
+          "label": "UNIQUE(sesion_id)"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-14",
+          "type": "node",
+          "parent": "1",
+          "label": "users"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-15",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-16",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-15",
+          "label": "PK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-17",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-15",
+          "label": "user_id serial"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-18",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-19",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-18"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-20",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-18",
+          "label": "login varchar(20) NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-21",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-22",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-21"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-23",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-21",
+          "label": "name varchar(15) NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-55",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-56",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-55"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-57",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-55",
+          "label": "password vartchar(192) NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-67",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-68",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-67"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-69",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-67",
+          "label": "avatar_path test DEFAULT ''"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-63",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-64",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-63"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-65",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-63",
+          "label": "embedding vector (768)"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-71",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-14"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-72",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-71"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-73",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-71",
+          "label": "UNIQUE(login)"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-104",
+          "type": "node",
+          "parent": "1",
+          "label": "messages"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-105",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-104"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-106",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-105",
+          "label": "PK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-107",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-105",
+          "label": "message_id"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-108",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-104"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-109",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-108",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-110",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-108",
+          "label": "sender_id int DELETE, UPDATE CASCADE"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-118",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-104"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-119",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-118",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-120",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-118",
+          "label": "received_id int DELETE, UPDATE CASCADE"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-122",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-104"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-123",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-122"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-124",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-122",
+          "label": "create_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-126",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-104"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-127",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-126",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-128",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-126",
+          "label": "related_announcement_id int DELETE, UPDATE CASCADE"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-111",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-104"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-112",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-111"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-113",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-111",
+          "label": "message text NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-160",
+          "type": "node",
+          "parent": "1",
+          "label": "embddings_users"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-164",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-160"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-165",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-164",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-166",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-164",
+          "label": "user_id int"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-167",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-160"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-168",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-167"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-169",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-167",
+          "label": "texrt text NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-173",
+          "type": "node",
+          "parent": "1",
+          "label": "embddings_announcements"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-174",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-173"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-175",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-174",
+          "label": "FK"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-176",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-174",
+          "label": "announcement_id int"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-177",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-173"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-178",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-177"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-179",
+          "type": "node",
+          "parent": "h3a6za-gh8egKDFXCwHy-177",
+          "label": "texrt text NOT NULL"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-180",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-15",
+          "target": "h3a6za-gh8egKDFXCwHy-28"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-183",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-15",
+          "target": "h3a6za-gh8egKDFXCwHy-164"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-184",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-15",
+          "target": "h3a6za-gh8egKDFXCwHy-76"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-187",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-15",
+          "target": "h3a6za-gh8egKDFXCwHy-108"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-188",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-15",
+          "target": "h3a6za-gh8egKDFXCwHy-118"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-189",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-2",
+          "target": "h3a6za-gh8egKDFXCwHy-126"
+        },
+        {
+          "id": "h3a6za-gh8egKDFXCwHy-190",
+          "type": "edge",
+          "parent": "1",
+          "source": "h3a6za-gh8egKDFXCwHy-2",
+          "target": "h3a6za-gh8egKDFXCwHy-174"
+        }
+      ]
+    }
+  ]
+}
