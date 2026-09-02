@@ -396,6 +396,98 @@
             <button type="submit">Найти</button>
         </form>
 
+       
+        <h2>Избранные объявления</h2>
+        <div class="horizontal-wrapper">
+            <div class="horizontal-list" id="horizontalContainer">
+                <!-- Карточки будут подгружаться сюда -->
+                <button id="loadMoreHorizontal" class="card load-more-card">Загрузить ещё</button>
+            </div>
+        </div>
+
+        <style>
+        .horizontal-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .horizontal-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px;
+            max-width: 90%;
+            scroll-snap-type: x mandatory;
+        }
+
+        .horizontal-list .card {
+            flex: 0 0 auto;
+            width: 250px;
+            scroll-snap-align: start;
+        }
+
+        .load-more-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+        </style>
+
+        <script>
+            let offsetHorizontal = 0;
+            const horizontalContainer = document.getElementById("horizontalContainer");
+            const loadBtnHorizontal = document.getElementById("loadMoreHorizontal");
+
+            async function loadHorizontalAds() {
+                const search = searchInput.value;
+                const category = categoryFilter.value;
+                const res = await fetch(`/search?offset=${offsetHorizontal}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&orderby=my`);
+                const data = await res.json();
+
+                if (data.length === 0) {
+                    loadBtnHorizontal.style.display = "none";
+                    return;
+                }
+
+                data.forEach(ad => {
+                    const card = document.createElement("a");
+                    card.href = ad.LinkToAnnouncement;
+                    card.className = "card";
+                    card.innerHTML = `
+                        ${ad.Images && ad.Images.length > 0 
+                            ? `<img src="${ad.Images[0]}" alt="Изображение объявления" class="card-img">`
+                            : `<div class="card-img placeholder"></div>`}
+                        <div class="owner">${ad.AuthorName}</div>
+                        <h3>${ad.Title}</h3>
+                        <p>${ad.Description}</p>
+                        <p class="category">${ad.Category}</p>
+                    `;
+                    // вставляем карточку перед кнопкой
+                    horizontalContainer.insertBefore(card, loadBtnHorizontal);
+                });
+            }
+
+            // Загружаем сразу при открытии страницы
+            document.addEventListener("DOMContentLoaded", () => {
+                loadHorizontalAds();
+            });
+
+            if (loadBtnHorizontal) {
+                loadBtnHorizontal.addEventListener("click", () => {
+                    offsetHorizontal++;
+                    loadHorizontalAds();
+                });
+            }
+        </script>
+
+
+
 
         {{if .Announcements}}
             <div class="cards" id="cardsContainer">
