@@ -12,7 +12,7 @@ import (
 
 const maxImagesSize5MB = 5 * 1024 * 1024
 
-func CreateAnnouncement(userID int, title, description, category, authorID string, images []*multipart.FileHeader) error {
+func CreateAnnouncement(userID int, title, description, category string, images []*multipart.FileHeader) error {
 	if err := initService(); err != nil {
 		return errors.New("Попробуйте создать чуть позже")
 	}
@@ -35,7 +35,7 @@ func CreateAnnouncement(userID int, title, description, category, authorID strin
 		}
 	}
 
-	announcementID, err := sendReqCreateAnnouncement(title, description, category, authorID)
+	announcementID, err := sendReqCreateAnnouncement(int32(userID), title, description, category)
 	if err != nil {
 		slog.Warn("Не удалось создать объявление", "announcementID", announcementID, "userID", userID, "error", err)
 		return err
@@ -53,7 +53,7 @@ func CreateAnnouncement(userID int, title, description, category, authorID strin
 	return nil
 }
 
-func sendReqCreateAnnouncement(title, description, category, authorID string) (int32, error) {
+func sendReqCreateAnnouncement(authorID int32, title, description, category string) (int32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 

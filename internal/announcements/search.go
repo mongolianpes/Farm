@@ -19,7 +19,7 @@ type AnnouncementData struct {
 	Images             []string
 }
 
-func SearchAnnouncements(offset, userID int, SearchString, category, orderBy, authorID string) ([]*AnnouncementData, error) {
+func SearchAnnouncements(offset, userID, authorID int, SearchString, category, orderBy string) ([]*AnnouncementData, error) {
 	if err := initService(); err != nil {
 		return []*AnnouncementData{}, err
 	}
@@ -33,7 +33,7 @@ func SearchAnnouncements(offset, userID int, SearchString, category, orderBy, au
 		SearchString: SearchString,
 		Category:     category,
 		Orderby:      orderBy,
-		AuthorID:     authorID,
+		AuthorID:     int32(authorID),
 	})
 	if err != nil {
 		slog.Warn("Не удалось получить список объявлений", "error", err)

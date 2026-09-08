@@ -69,17 +69,19 @@ func getAnnouncementsByParameters(db *sql.DB, rdb rdb.DB, w http.ResponseWriter,
 	orderBy := r.URL.Query().Get("orderby")
 
 	authorID := r.URL.Query().Get("authorid")
+	authorIDInt := 0
 	if authorID == "" {
 		if login := r.URL.Query().Get("login"); login == "my" {
-			authorIDInt, err := session.GetUserID(db, rdb, w, r)
+			authorIDInt, err = session.GetUserID(db, rdb, w, r)
 			if err != nil {
 				return data, err
 			}
-			authorID = strconv.Itoa(authorIDInt)
 		}
+	} else {
+		authorIDInt, err = strconv.Atoi(authorID)
 	}
 
-	data, err = announcements.SearchAnnouncements(offsetInt, userIDInt, searchString, category, orderBy, authorID)
+	data, err = announcements.SearchAnnouncements(offsetInt, userIDInt, authorIDInt, searchString, category, orderBy)
 	if err != nil {
 		return data, err
 	}

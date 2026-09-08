@@ -17,8 +17,8 @@ const (
 type MessengerData struct {
 	Name                  string
 	PartnerAvatar         string
-	PartnerID             int
-	RelatedAnnouncementID int
+	PartnerID             string
+	RelatedAnnouncementID string
 	Partners              []*messenger.ChatInfo
 }
 
@@ -57,12 +57,7 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		}
 	} else {
-		var err error
-		pageData.PartnerID, err = strconv.Atoi(partnerID)
-		if err != nil {
-			http.Error(w, "Неверный partnerID", http.StatusBadRequest)
-			return
-		}
+		pageData.PartnerID = partnerID
 
 		if err := h.DB.QueryRow("SELECT name, avatar_path FROM users WHERE user_id = $1", partnerID).Scan(&pageData.Name, &pageData.PartnerAvatar); err != nil {
 			http.Error(w, "Не удалось получить партнера", http.StatusInternalServerError)
@@ -70,11 +65,7 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		relatedAnnouncementID := r.URL.Query().Get("relatedannouncementid")
-		pageData.RelatedAnnouncementID, err = strconv.Atoi(relatedAnnouncementID)
-		if err != nil {
-			http.Error(w, "Неверное relatedAnnouncementID", http.StatusBadRequest)
-			return
-		}
+		pageData.RelatedAnnouncementID = relatedAnnouncementID
 
 		pageData.PartnerAvatar = images.MakeCurrentPathToImage(pageData.PartnerAvatar)
 	}

@@ -42,7 +42,7 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 	category := r.FormValue("category")
 	images := r.MultipartForm.File["images"]
 
-	if err := announcements.CreateAnnouncement(userID, title, description, category, strconv.Itoa(userID), images); err != nil {
+	if err := announcements.CreateAnnouncement(userID, title, description, category, images); err != nil {
 		data.Description = description
 		data.Title = title
 		data.Category = category
