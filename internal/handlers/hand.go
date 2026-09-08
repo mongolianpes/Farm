@@ -51,7 +51,10 @@ func NewHand() *Handler {
 		panic(err)
 	}
 
-	rdb := rdb.NewClient()
+	rdb, err := rdb.NewClient("rdb:6379")
+	if err != nil {
+		panic(err)
+	}
 
 	tmpl, err := template.ParseGlob(htmlPages)
 	if err != nil {

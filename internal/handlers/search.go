@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 	"strconv"
@@ -12,9 +13,12 @@ import (
 )
 
 func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
-	data, err := getAnnouncementsByParameters(h.DB, h.RedisDB, w, r)
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	data, err := getAnnouncementsByParameters(ctx, h.DB, h.RedisDB, w, r)
 	if err != nil {
-		if err.Error() == "User have not session" {
+		if err == session.ErrUserHaveNotSession {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
 		}
@@ -36,7 +40,7 @@ func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func getAnnouncementsByParameters(db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*announcements.AnnouncementData, error) {
+func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*announcements.AnnouncementData, error) {
 	var offsetInt int
 	var err error
 	data := []*announcements.AnnouncementData{}
@@ -56,7 +60,15 @@ func getAnnouncementsByParameters(db *sql.DB, rdb rdb.DB, w http.ResponseWriter,
 		if login := r.URL.Query().Get("login"); login != "" {
 			userIDInt, _ = users.GetUserID(login)
 		} else {
-			userIDInt, _ = session.GetUserID(db, rdb, w, r)
+			sessionID, err := session.GetCookie(r)
+			if err != nil {
+				return data, err
+			}
+			var newSession string
+			newSession, userIDInt, _ = session.GetUserID(ctx, db, rdb, sessionID)
+			if newSession != "" {
+				session.SetCookie(w, newSession)
+			}
 		}
 	} else {
 		userIDInt, _ = strconv.Atoi(userID)
@@ -72,9 +84,17 @@ func getAnnouncementsByParameters(db *sql.DB, rdb rdb.DB, w http.ResponseWriter,
 	authorIDInt := 0
 	if authorID == "" {
 		if login := r.URL.Query().Get("login"); login == "my" {
-			authorIDInt, err = session.GetUserID(db, rdb, w, r)
+			sessionID, err := session.GetCookie(r)
 			if err != nil {
 				return data, err
+			}
+			var newSession string
+			newSession, authorIDInt, err = session.GetUserID(ctx, db, rdb, sessionID)
+			if err != nil {
+				return data, err
+			}
+			if newSession != "" {
+				session.SetCookie(w, newSession)
 			}
 		}
 	} else {

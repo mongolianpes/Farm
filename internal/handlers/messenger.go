@@ -29,18 +29,25 @@ type SendMessage struct {
 }
 
 func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
 	pageData := MessengerData{}
 
 	partnerID := r.URL.Query().Get("partnerid")
 	if partnerID == "" {
-		userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+		sessionID, err := session.GetCookie(r)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
 		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
-		defer cancel()
+		newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+		if err != nil {
+			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+			return
+		}
+		if newSession != "" {
+			session.SetCookie(w, newSession)
+		}
 
 		chats, err := h.Messenger.GetUserChats(ctx, userID)
 		if err != nil {
@@ -78,11 +85,21 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/messenger", http.StatusSeeOther)
 		return
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
 
-	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+	sessionID, err := session.GetCookie(r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
+	}
+	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	if err != nil {
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
+	}
+	if newSession != "" {
+		session.SetCookie(w, newSession)
 	}
 
 	var sendMessage SendMessage
@@ -90,9 +107,6 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Не удалось разобрать полученный данные", http.StatusBadRequest)
 		return
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
-	defer cancel()
 
 	if err := h.Messenger.SendMessege(ctx, userID, sendMessage.ReceivedUsedID, sendMessage.RelatedAnnouncementID, sendMessage.Text); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -102,10 +116,21 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	sessionID, err := session.GetCookie(r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
+	}
+	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	if err != nil {
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
+	}
+	if newSession != "" {
+		session.SetCookie(w, newSession)
 	}
 
 	partnerIDStr := r.URL.Query().Get("partnerid")
@@ -141,9 +166,6 @@ func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Должно быть числом relatedannouncementid", http.StatusBadRequest)
 		return
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
-	defer cancel()
 
 	chat, err := h.Messenger.GetChatHistory(ctx, userID, partnerID, relatedAnnouncementID, offsetInt)
 	if err != nil {

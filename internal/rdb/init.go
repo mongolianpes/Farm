@@ -2,28 +2,38 @@ package rdb
 
 import (
 	"context"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
 
 type Client struct {
 	rdb *redis.Client
-	ctx context.Context
 }
 
 type DB interface {
-	SetSession(key, value string) error
-	GetUserID(key string) (string, error)
+	SetSession(ctx context.Context, sessionKey, userID string) error
+	GetUserID(ctx context.Context, sessionKey string) (string, error)
 	Close() error
 }
 
-func NewClient() *Client {
-	return &Client{
-		rdb: redis.NewClient(&redis.Options{
-			Addr: "rdb:6379",
-		}),
-		ctx: context.Background(),
+func NewClient(redisAddr string) (*Client, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisAddr,
+	})
+	_, err := redisClient.Ping(ctx).Result()
+	if err != nil {
+		return nil, err
 	}
+
+	rdb := &Client{
+		rdb: redisClient,
+	}
+
+	return rdb, nil
 }
 
 func (c *Client) Close() error {

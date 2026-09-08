@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -30,10 +31,21 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	sessionID, err := session.GetCookie(r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
+	}
+	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	if err != nil {
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
+	}
+	if newSession != "" {
+		session.SetCookie(w, newSession)
 	}
 
 	r.ParseMultipartForm(20 << 20)
@@ -55,18 +67,21 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
 	if announcementIDStr := r.URL.Query().Get("id"); announcementIDStr != "" {
 		if announcementID, err := strconv.Atoi(announcementIDStr); err == nil {
-			h.showOneAnnouncement(w, r, announcementID)
+			h.showOneAnnouncement(w, r, ctx, announcementID)
 			return
 		}
 	}
 
 	var err error
 	data := AnnouncementsData{}
-	data.Announcements, err = getAnnouncementsByParameters(h.DB, h.RedisDB, w, r)
+	data.Announcements, err = getAnnouncementsByParameters(ctx, h.DB, h.RedisDB, w, r)
 	if err != nil {
-		if err.Error() == "User have not session" {
+		if err == session.ErrUserHaveNotSession {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
 		}
@@ -80,11 +95,19 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 	h.Tmpl.ExecuteTemplate(w, "announcements.html", data)
 }
 
-func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, announcementID int) {
-	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, ctx context.Context, announcementID int) {
+	sessionID, err := session.GetCookie(r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
+	}
+	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	if err != nil {
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
+	}
+	if newSession != "" {
+		session.SetCookie(w, newSession)
 	}
 
 	announcementInfo, err := announcements.GetAnnouncementInfo(announcementID, userID)
@@ -121,6 +144,8 @@ func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/profile?login=my", http.StatusSeeOther)
 		return
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
 
 	idStr := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
@@ -129,9 +154,17 @@ func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+	sessionID, err := session.GetCookie(r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
+	}
+	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	if err != nil {
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+	}
+	if newSession != "" {
+		session.SetCookie(w, newSession)
 	}
 
 	if err := announcements.DeleteAnnouncement(id, userID); err != nil {

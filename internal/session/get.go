@@ -1,50 +1,49 @@
 package session
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"log/slog"
-	"net/http"
 	"strconv"
 	"time"
 
 	"project-farm/internal/rdb"
 )
 
-func GetUserID(db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) (int, error) {
+var ErrUserHaveNotSession = errors.New("User have not session")
+
+func GetUserID(ctx context.Context, db *sql.DB, rdb rdb.DB, session string) (string, int, error) {
 	var userID int = -1
 	var createAt time.Time
-	cookie, err := r.Cookie(SessionIDCookieName)
-	if err != nil {
-		return userID, errors.New("Не имеется текущей ID сессии в Cookie")
-	}
 
-	userIDStr, err := rdb.GetUserID(cookie.Value)
+	userIDStr, err := rdb.GetUserID(ctx, session)
 	if err != nil {
-		userID, createAt, err = getUserIDFromSQLDB(db, cookie.Value)
+		userID, createAt, err = getUserIDFromSQLDB(db, session)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				slog.Warn("Попытка аутентификации по не существующей ID сесии", "sessionID", cookie.Value, "userIP", r.RemoteAddr)
+				slog.Warn("Попытка аутентификации по не существующей ID сесии", "sessionID", session)
 			}
-			return userID, err
+			return "", userID, ErrUserHaveNotSession
 		}
 	}
 	userID, err = strconv.Atoi(userIDStr)
 	if err != nil {
-		userID, createAt, err = getUserIDFromSQLDB(db, cookie.Value)
+		userID, createAt, err = getUserIDFromSQLDB(db, session)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				slog.Warn("Попытка аутентификации по не существующей ID сесии", "sessionID", cookie.Value, "userIP", r.RemoteAddr)
+				slog.Warn("Попытка аутентификации по не существующей ID сесии", "sessionID", session)
 			}
-			return userID, err
+			return "", userID, ErrUserHaveNotSession
 		}
 	}
 
+	newSession := ""
 	if createAt.Add(24 * time.Hour).Before(time.Now()) {
-		SetSessionID(db, rdb, userID, w)
+		newSession, _ = SetSessionID(ctx, db, rdb, userID)
 	}
 
-	return userID, nil
+	return newSession, userID, nil
 }
 
 func getUserIDFromSQLDB(db *sql.DB, session string) (int, time.Time, error) {

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -79,6 +80,9 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
 	var data AuthPageData
 	if r.Method != http.MethodPost {
 		h.Tmpl.ExecuteTemplate(w, "auth.html", data)
@@ -95,11 +99,22 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := session.SetSessionID(h.DB, h.RedisDB, userInfo.ID, w); err != nil {
+	sessionID, err := session.SetSessionID(ctx, h.DB, h.RedisDB, userInfo.ID)
+	if err != nil {
 		data.Error = err.Error()
 		h.Tmpl.ExecuteTemplate(w, "auth.html", data)
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     session.IDCookieName,
+		Value:    sessionID,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(4 * 24 * time.Hour),
+	})
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     userNameCookieName,
@@ -123,6 +138,9 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
 	if len(r.URL.Query()) == 0 {
 		http.Redirect(w, r, "/profile?login=my", http.StatusSeeOther)
 		return
@@ -132,9 +150,18 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	login := r.URL.Query().Get("login")
 	if login == myLoginAlias {
-		userID, err = session.GetUserID(h.DB, h.RedisDB, w, r)
+		sessionID, err := session.GetCookie(r)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+			return
+		}
+		var newSession string
+		newSession, userID, err = session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+		if err != nil {
+			http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		}
+		if newSession != "" {
+			session.SetCookie(w, newSession)
 		}
 	}
 
@@ -152,9 +179,9 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		SearchString: r.URL.Query().Get("search"),
 	}
 
-	announcementsData, err := getAnnouncementsByParameters(h.DB, h.RedisDB, w, r)
+	announcementsData, err := getAnnouncementsByParameters(ctx, h.DB, h.RedisDB, w, r)
 	if err != nil {
-		if err.Error() == "User have not session" {
+		if err == session.ErrUserHaveNotSession {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
 		}
@@ -166,10 +193,21 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetHeaderCookieHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
+	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
+	defer cancel()
+
+	sessionID, err := session.GetCookie(r)
+	if err != nil {
+		http.Redirect(w, r, "/auth", http.StatusSeeOther)
+		return
+	}
+	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
 	if err != nil {
 		http.Error(w, "Данной сессии не существует", http.StatusBadRequest)
 		return
+	}
+	if newSession != "" {
+		session.SetCookie(w, newSession)
 	}
 
 	userInfo, err := users.GetUserInfo(userID, "")
