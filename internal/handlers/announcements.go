@@ -30,7 +30,7 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userID, err := session.GetUserID(h.DB, w, r)
+	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
@@ -64,7 +64,7 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 
 	var err error
 	data := AnnouncementsData{}
-	data.Announcements, err = getAnnouncementsByParameters(h.DB, w, r)
+	data.Announcements, err = getAnnouncementsByParameters(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		if err.Error() == "User have not session" {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
@@ -81,7 +81,7 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, announcementID int) {
-	userID, err := session.GetUserID(h.DB, w, r)
+	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
@@ -129,7 +129,7 @@ func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userID, err := session.GetUserID(h.DB, w, r)
+	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 	}

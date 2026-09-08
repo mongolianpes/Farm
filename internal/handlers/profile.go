@@ -95,7 +95,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := session.SetSessionID(h.DB, userInfo.ID, w); err != nil {
+	if err := session.SetSessionID(h.DB, h.RedisDB, userInfo.ID, w); err != nil {
 		data.Error = err.Error()
 		h.Tmpl.ExecuteTemplate(w, "auth.html", data)
 		return
@@ -132,7 +132,7 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	login := r.URL.Query().Get("login")
 	if login == myLoginAlias {
-		userID, err = session.GetUserID(h.DB, w, r)
+		userID, err = session.GetUserID(h.DB, h.RedisDB, w, r)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		}
@@ -152,7 +152,7 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		SearchString: r.URL.Query().Get("search"),
 	}
 
-	announcementsData, err := getAnnouncementsByParameters(h.DB, w, r)
+	announcementsData, err := getAnnouncementsByParameters(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		if err.Error() == "User have not session" {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
@@ -166,7 +166,7 @@ func (h *Handler) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetHeaderCookieHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := session.GetUserID(h.DB, w, r)
+	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		http.Error(w, "Данной сессии не существует", http.StatusBadRequest)
 		return

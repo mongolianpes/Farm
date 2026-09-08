@@ -6,12 +6,13 @@ import (
 	"strconv"
 
 	"project-farm/internal/announcements"
+	"project-farm/internal/rdb"
 	"project-farm/internal/session"
 	"project-farm/internal/users"
 )
 
 func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
-	data, err := getAnnouncementsByParameters(h.DB, w, r)
+	data, err := getAnnouncementsByParameters(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		if err.Error() == "User have not session" {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
@@ -35,7 +36,7 @@ func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Request) ([]*announcements.AnnouncementData, error) {
+func getAnnouncementsByParameters(db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*announcements.AnnouncementData, error) {
 	var offsetInt int
 	var err error
 	data := []*announcements.AnnouncementData{}
@@ -55,7 +56,7 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 		if login := r.URL.Query().Get("login"); login != "" {
 			userIDInt, _ = users.GetUserID(login)
 		} else {
-			userID, _ = session.GetUserIDStr(db, w, r)
+			userIDInt, _ = session.GetUserID(db, rdb, w, r)
 		}
 	} else {
 		userIDInt, _ = strconv.Atoi(userID)
@@ -70,10 +71,11 @@ func getAnnouncementsByParameters(db *sql.DB, w http.ResponseWriter, r *http.Req
 	authorID := r.URL.Query().Get("authorid")
 	if authorID == "" {
 		if login := r.URL.Query().Get("login"); login == "my" {
-			authorID, err = session.GetUserIDStr(db, w, r)
+			authorIDInt, err := session.GetUserID(db, rdb, w, r)
 			if err != nil {
 				return data, err
 			}
+			authorID = strconv.Itoa(authorIDInt)
 		}
 	}
 

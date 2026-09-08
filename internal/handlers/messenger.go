@@ -33,7 +33,7 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 
 	partnerID := r.URL.Query().Get("partnerid")
 	if partnerID == "" {
-		userID, err := session.GetUserID(h.DB, w, r)
+		userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
@@ -88,7 +88,7 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := session.GetUserID(h.DB, w, r)
+	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
@@ -111,7 +111,7 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := session.GetUserID(h.DB, w, r)
+	userID, err := session.GetUserID(h.DB, h.RedisDB, w, r)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return

@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"project-farm/internal/messenger"
+	"project-farm/internal/rdb"
 )
 
 type Handler struct {
 	Tmpl      *template.Template
 	DB        *sql.DB
-	Messenger *messenger.Client
+	RedisDB   rdb.DB
+	Messenger messenger.Messenger
 }
 
 const timeToCompleteRequest = 30 * time.Second
@@ -49,6 +51,8 @@ func NewHand() *Handler {
 		panic(err)
 	}
 
+	rdb := rdb.NewClient()
+
 	tmpl, err := template.ParseGlob(htmlPages)
 	if err != nil {
 		panic(err)
@@ -62,6 +66,7 @@ func NewHand() *Handler {
 	return &Handler{
 		Tmpl:      tmpl,
 		DB:        db,
+		RedisDB:   rdb,
 		Messenger: messenger,
 	}
 }

@@ -4,14 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"project-farm/internal/crypto"
+	"project-farm/internal/rdb"
 
 	"github.com/lib/pq"
 )
 
-func SetSessionID(db *sql.DB, userID int, w http.ResponseWriter) error {
+func SetSessionID(db *sql.DB, rdb rdb.DB, userID int, w http.ResponseWriter) error {
 	var sessionID string
 	var err error
 	for {
@@ -34,6 +36,10 @@ func SetSessionID(db *sql.DB, userID int, w http.ResponseWriter) error {
 		}
 	}
 
+	if err := rdb.SetSession(sessionID, strconv.Itoa(userID)); err != nil {
+		return err
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionIDCookieName,
 		Value:    sessionID,
@@ -47,7 +53,7 @@ func SetSessionID(db *sql.DB, userID int, w http.ResponseWriter) error {
 	return nil
 }
 
-func SetSessionIDStr(db *sql.DB, userID string, w http.ResponseWriter) error {
+func SetSessionIDStr(db *sql.DB, rdb rdb.DB, userID string, w http.ResponseWriter) error {
 	var sessionID string
 	var err error
 	for {
@@ -68,6 +74,10 @@ func SetSessionIDStr(db *sql.DB, userID string, w http.ResponseWriter) error {
 		} else {
 			break
 		}
+	}
+
+	if err := rdb.SetSession(sessionID, userID); err != nil {
+		return err
 	}
 
 	http.SetCookie(w, &http.Cookie{

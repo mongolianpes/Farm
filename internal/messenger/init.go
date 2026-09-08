@@ -21,6 +21,7 @@ type Messenger interface {
 	SendMessege(ctx context.Context, senderID, receivedID, relatedAnnouncementID int, messageText string) error
 	GetUserChats(ctx context.Context, userID int) ([]*ChatInfo, error)
 	GetChatHistory(ctx context.Context, userID, partnerID, relatedAnnouncementID, offset int) ([]*message, error)
+	Close() error
 }
 
 var messengerServiceHost = os.Getenv("MESSENGER_SERVICE_HOST_GRPC_PORT")
