@@ -4,28 +4,37 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"strconv"
+
+	"project-farm/internal/models"
+	"project-farm/internal/rdb"
 
 	pb "project-farm/internal/announcements/proto"
 )
 
-type AnnouncementData struct {
-	AuthorName         string
-	AuthorID           int
-	Title              string
-	Description        string
-	Category           string
-	LinkToAnnouncement string
-	AnnouncementID     int
-	Images             []string
-}
-
-func SearchAnnouncements(offset, userID, authorID int, SearchString, category, orderBy string) ([]*AnnouncementData, error) {
+func SearchAnnouncements(rdb rdb.DB, offset, userID, authorID int, SearchString, category, orderBy string) ([]*models.AnnouncementData, error) {
 	if err := initService(); err != nil {
-		return []*AnnouncementData{}, err
+		return []*models.AnnouncementData{}, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
+
+	result := []*models.AnnouncementData{}
+
+	savedAnnouncementIDs, err := rdb.GetAnnouncementsIDsForUser(ctx, strconv.Itoa(userID))
+	if err == nil && len(savedAnnouncementIDs) != 0 {
+		for _, id := range savedAnnouncementIDs {
+			announcement, err := rdb.GetAnnouncementInfo(ctx, id)
+			if err != nil {
+				break
+			}
+
+			result = append(result, announcement)
+		}
+
+		return result, nil
+	}
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
 		Offset:       int32(offset),
@@ -40,9 +49,9 @@ func SearchAnnouncements(offset, userID, authorID int, SearchString, category, o
 		return nil, err
 	}
 
-	result := []*AnnouncementData{}
+	var announcementIDs []interface{}
 	for _, announcement := range resp.AnnouncementsData {
-		result = append(result, &AnnouncementData{
+		result = append(result, &models.AnnouncementData{
 			AuthorName:         announcement.AuthorName,
 			AuthorID:           int(announcement.AuthorID),
 			Title:              announcement.Title,
@@ -52,18 +61,35 @@ func SearchAnnouncements(offset, userID, authorID int, SearchString, category, o
 			AnnouncementID:     int(announcement.AnnouncementID),
 			Images:             announcement.Images,
 		})
+
+		announcementIDs = append(announcementIDs, announcement.AnnouncementID)
+	}
+
+	if err := rdb.SaveAnnouncementIDsForUser(ctx, announcementIDs, strconv.Itoa(userID)); err != nil {
+		slog.Error("Не удалось сохранить список объявлений в redis")
+	} else {
+		for _, announcement := range result {
+			if err := rdb.SaveAnnouncementInfo(ctx, *announcement); err != nil {
+				slog.Error("Не удалось сохранить объявлениe в redis")
+			}
+		}
 	}
 
 	return result, nil
 }
 
-func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
+func GetAnnouncementInfo(rdb rdb.DB, announcementID, userID int) (models.AnnouncementData, error) {
 	if err := initService(); err != nil {
-		return AnnouncementData{}, err
+		return models.AnnouncementData{}, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
+
+	savedAnnouncement, err := rdb.GetAnnouncementInfo(ctx, strconv.Itoa(announcementID))
+	if err == nil {
+		return *savedAnnouncement, nil
+	}
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
 		AnnouncementID: int32(announcementID),
@@ -71,11 +97,11 @@ func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
 	})
 	if err != nil {
 		slog.Warn("Не удалось получить объявление", "announcementID", announcementID, "userID", userID, "error", err)
-		return AnnouncementData{}, err
+		return models.AnnouncementData{}, err
 	}
 
 	for _, announcement := range resp.AnnouncementsData {
-		return AnnouncementData{
+		result := models.AnnouncementData{
 			AuthorName:         announcement.AuthorName,
 			AuthorID:           int(announcement.AuthorID),
 			Title:              announcement.Title,
@@ -84,8 +110,14 @@ func GetAnnouncementInfo(announcementID, userID int) (AnnouncementData, error) {
 			LinkToAnnouncement: announcement.LinkToAnnouncement,
 			AnnouncementID:     int(announcement.AnnouncementID),
 			Images:             announcement.Images,
-		}, nil
+		}
+
+		if err := rdb.SaveAnnouncementInfo(ctx, result); err != nil {
+			slog.Error("Не удалось сохранить объявлениe в redis")
+		}
+
+		return result, nil
 	}
 
-	return AnnouncementData{}, errors.New("Данного объявления не существует")
+	return models.AnnouncementData{}, errors.New("Данного объявления не существует")
 }

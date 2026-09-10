@@ -7,6 +7,7 @@ import (
 
 	"project-farm/internal/announcements"
 	"project-farm/internal/images"
+	"project-farm/internal/models"
 	"project-farm/internal/session"
 )
 
@@ -21,7 +22,7 @@ type AnnouncementsData struct {
 	ManyAnnouncements bool
 	SearchString      string
 	SearchCategory    string
-	Announcements     []*announcements.AnnouncementData
+	Announcements     []*models.AnnouncementData
 }
 
 func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,13 +111,13 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, ct
 		session.SetCookie(w, newSession)
 	}
 
-	announcementInfo, err := announcements.GetAnnouncementInfo(announcementID, userID)
+	announcementInfo, err := announcements.GetAnnouncementInfo(h.RedisDB, announcementID, userID)
 	if err != nil {
 		announcementInfo.Description = "Произошла ошибка " + err.Error()
 	}
 
 	data := AnnouncementsData{
-		Announcements: []*announcements.AnnouncementData{},
+		Announcements: []*models.AnnouncementData{},
 	}
 
 	var imagesWithCurrentPath []string
@@ -124,7 +125,7 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, ct
 		imagesWithCurrentPath = append(imagesWithCurrentPath, images.MakeCurrentPathToImage(image))
 	}
 
-	data.Announcements = append(data.Announcements, &announcements.AnnouncementData{
+	data.Announcements = append(data.Announcements, &models.AnnouncementData{
 		AuthorName:     announcementInfo.AuthorName,
 		AuthorID:       announcementInfo.AuthorID,
 		Title:          announcementInfo.Title,

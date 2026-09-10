@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"project-farm/internal/models"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -14,6 +16,10 @@ type Client struct {
 type DB interface {
 	SetSession(ctx context.Context, sessionKey, userID string) error
 	GetUserID(ctx context.Context, sessionKey string) (string, error)
+	SaveAnnouncementIDsForUser(ctx context.Context, announcements []interface{}, userID string) error
+	GetAnnouncementsIDsForUser(ctx context.Context, userID string) ([]string, error)
+	SaveAnnouncementInfo(ctx context.Context, announcementInfo models.AnnouncementData) error
+	GetAnnouncementInfo(ctx context.Context, announcementID string) (*models.AnnouncementData, error)
 	Close() error
 }
 

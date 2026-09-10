@@ -397,7 +397,7 @@
         </form>
 
        
-        <h2>Избранные объявления</h2>
+        <h2>Похожие на ваши объявления</h2>
         <div class="horizontal-wrapper">
             <div class="horizontal-list" id="horizontalContainer">
                 <!-- Карточки будут подгружаться сюда -->
@@ -490,6 +490,8 @@
 
 
         {{if .Announcements}}
+        
+            <h2>Объявления</h2>
             <div class="cards" id="cardsContainer">
                 {{range .Announcements}}
                     <a href="{{.LinkToAnnouncement}}" class="card">

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"project-farm/internal/announcements"
+	"project-farm/internal/models"
 	"project-farm/internal/rdb"
 	"project-farm/internal/session"
 	"project-farm/internal/users"
@@ -22,7 +23,7 @@ func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
 		}
-		data = []*announcements.AnnouncementData{}
+		data = []*models.AnnouncementData{}
 	}
 
 	if r.URL.Query().Get("offset") == "" {
@@ -40,10 +41,10 @@ func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*announcements.AnnouncementData, error) {
+func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*models.AnnouncementData, error) {
 	var offsetInt int
 	var err error
-	data := []*announcements.AnnouncementData{}
+	data := []*models.AnnouncementData{}
 	offset := r.URL.Query().Get("offset")
 	if offset == "" {
 		offsetInt = 0
@@ -101,7 +102,7 @@ func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w
 		authorIDInt, err = strconv.Atoi(authorID)
 	}
 
-	data, err = announcements.SearchAnnouncements(offsetInt, userIDInt, authorIDInt, searchString, category, orderBy)
+	data, err = announcements.SearchAnnouncements(rdb, offsetInt, userIDInt, authorIDInt, searchString, category, orderBy)
 	if err != nil {
 		return data, err
 	}

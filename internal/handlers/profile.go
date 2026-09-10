@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"project-farm/internal/announcements"
 	"project-farm/internal/images"
+	"project-farm/internal/models"
 	"project-farm/internal/session"
 	"project-farm/internal/users"
 )
@@ -38,7 +38,7 @@ type ProfileData struct {
 	ID            int
 	SearchString  string
 	AvatarPath    string
-	Announcements []*announcements.AnnouncementData
+	Announcements []*models.AnnouncementData
 }
 
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {

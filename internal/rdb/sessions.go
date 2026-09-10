@@ -5,10 +5,13 @@ import (
 	"time"
 )
 
-const sessionPrefix string = "session_"
+const (
+	sessionPrefix            string = "session_"
+	timeToSaveSessionInRedis        = time.Hour
+)
 
 func (c *Client) SetSession(ctx context.Context, sessionKey, userID string) error {
-	err := c.rdb.Set(ctx, sessionPrefix+sessionKey, userID, time.Hour).Err()
+	err := c.rdb.Set(ctx, sessionPrefix+sessionKey, userID, timeToSaveSessionInRedis).Err()
 	return err
 }
 
