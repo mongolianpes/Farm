@@ -49,19 +49,10 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 			session.SetCookie(w, newSession)
 		}
 
-		chats, err := h.Messenger.GetUserChats(ctx, userID)
+		pageData.Partners, err = h.Messenger.GetUserChats(ctx, userID)
 		if err != nil {
 			http.Error(w, "Ошибка при получении чатов", http.StatusInternalServerError)
 			return
-		}
-
-		for _, chat := range chats {
-			pageData.Partners = append(pageData.Partners, &messenger.ChatInfo{
-				PartnerID:             chat.PartnerID,
-				PartnerName:           chat.PartnerName,
-				PartnerAvatarPath:     images.MakeCurrentPathToImage(chat.PartnerAvatarPath),
-				RelatedAnnouncementID: chat.RelatedAnnouncementID,
-			})
 		}
 	} else {
 		pageData.PartnerID = partnerID

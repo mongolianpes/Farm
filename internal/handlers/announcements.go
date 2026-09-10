@@ -125,15 +125,7 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, ct
 		imagesWithCurrentPath = append(imagesWithCurrentPath, images.MakeCurrentPathToImage(image))
 	}
 
-	data.Announcements = append(data.Announcements, &models.AnnouncementData{
-		AuthorName:     announcementInfo.AuthorName,
-		AuthorID:       announcementInfo.AuthorID,
-		Title:          announcementInfo.Title,
-		Description:    announcementInfo.Description,
-		Category:       announcementInfo.Category,
-		Images:         imagesWithCurrentPath,
-		AnnouncementID: announcementInfo.AnnouncementID,
-	})
+	data.Announcements = append(data.Announcements, &announcementInfo)
 
 	data.ManyAnnouncements = false
 
