@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	redisKeyAnnouncementID     = "announcementID"
 	redisKeyAuthorName         = "authorName"
 	redisKeyAuthorID           = "authorID"
 	redisKeyTitle              = "Title"
@@ -61,7 +62,7 @@ func (c *Client) SaveAnnouncementInfo(ctx context.Context, announcementInfo mode
 	return nil
 }
 
-func (c *Client) GetAnnouncementInfo(ctx context.Context, announcementID string) (*models.AnnouncementData, error) {
+func (c *Client) GetAnnouncementInfo(ctx context.Context, announcementID int) (*models.AnnouncementData, error) {
 	info, err := c.rdb.HGetAll(ctx, fmt.Sprintf(redisKeyPrefixAnnouncementInfo, announcementID)).Result()
 	if err != nil {
 		return nil, err
@@ -79,10 +80,12 @@ func (c *Client) GetAnnouncementInfo(ctx context.Context, announcementID string)
 
 	return &models.AnnouncementData{
 		AuthorName:         info[redisKeyAuthorName],
+		AnnouncementID:     announcementID,
 		AuthorID:           authorID,
 		Title:              info[redisKeyTitle],
 		Description:        info[redisKeyDescription],
 		Category:           info[redisKeyCategory],
 		LinkToAnnouncement: info[redisKeyLinkToAnnouncement],
+		Images:             images,
 	}, nil
 }

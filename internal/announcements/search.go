@@ -25,7 +25,11 @@ func SearchAnnouncements(rdb rdb.DB, offset, userID, authorID int, SearchString,
 	savedAnnouncementIDs, err := rdb.GetAnnouncementsIDsForUser(ctx, strconv.Itoa(userID))
 	if err == nil && len(savedAnnouncementIDs) != 0 {
 		for _, id := range savedAnnouncementIDs {
-			announcement, err := rdb.GetAnnouncementInfo(ctx, id)
+			idStr, err := strconv.Atoi(id)
+			if err != nil {
+				break
+			}
+			announcement, err := rdb.GetAnnouncementInfo(ctx, idStr)
 			if err != nil {
 				break
 			}
@@ -86,7 +90,7 @@ func GetAnnouncementInfo(rdb rdb.DB, announcementID, userID int) (models.Announc
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
-	savedAnnouncement, err := rdb.GetAnnouncementInfo(ctx, strconv.Itoa(announcementID))
+	savedAnnouncement, err := rdb.GetAnnouncementInfo(ctx, announcementID)
 	if err == nil {
 		return *savedAnnouncement, nil
 	}
