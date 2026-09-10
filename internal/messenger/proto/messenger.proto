@@ -1,55 +1,55 @@
 syntax = "proto3";
 
-import "timestamp.proto";
-
 package messenger;
+
+import "timestamp.proto";
 
 option go_package = ".";
 
 message GetChatsRequest {
-    int32 userID = 1;
+  int64 userID = 1;
 }
 
 message GetChatsResponse {
-    repeated ChatInfo chats = 1;
+  repeated ChatInfo chats = 1;
 }
 
 message ChatInfo {
-    int32 partnerID = 1;
-    string partnerName = 2;
-    string relatedAnnouncementTitle = 3;
-    string partnerAvatarPath = 4;
-    int32 relatedAnnouncementID = 5;
+  int64 partnerID = 1;
+  string partnerName = 2;
+  string relatedAnnouncementTitle = 3;
+  string partnerAvatarPath = 4;
+  int64 relatedAnnouncementID = 5;
 }
 
 message SendMessageRequest {
-    int32 receivedID = 1;
-    int32 senderID = 2;
-    int32 relatedAnnouncementID = 3;
-    string text = 4;
+  int64 receivedID = 1;
+  int64 senderID = 2;
+  int64 relatedAnnouncementID = 3;
+  string text = 4;
 }
 
 message SendMessageResponse {}
 
 message GetChatHistoryRequest {
-    int32 partnerID = 1;
-    int32 userID = 2;
-    int32 relatedAnnouncementID = 3;
-    int32 offset = 4;
+  int64 partnerID = 1;
+  int64 userID = 2;
+  int64 relatedAnnouncementID = 3;
+  int64 offset = 4;
 }
 
 message GetChatHistoryResponse {
-    repeated GetChatHistoryMessage messages = 1;
+  repeated GetChatHistoryMessage messages = 1;
 }
 
 message GetChatHistoryMessage {
-    string text = 1;
-    bool myMessage = 2;
-    google.protobuf.Timestamp createAt = 3;
+  string text = 1;
+  bool myMessage = 2;
+  google.protobuf.Timestamp createAt = 3;
 }
 
 service Messenger {
-    rpc GetChats(GetChatsRequest) returns (GetChatsResponse);
-    rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);   
-    rpc GetChatHistory(GetChatHistoryRequest) returns (GetChatHistoryResponse);
+  rpc GetChats(GetChatsRequest) returns (GetChatsResponse);
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc GetChatHistory(GetChatHistoryRequest) returns (GetChatHistoryResponse);
 }

@@ -24,7 +24,7 @@ const (
 type GetUserInfoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserLogin     string                 `protobuf:"bytes,1,opt,name=userLogin,proto3" json:"userLogin,omitempty"`
-	UserID        int32                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -66,7 +66,7 @@ func (x *GetUserInfoRequest) GetUserLogin() string {
 	return ""
 }
 
-func (x *GetUserInfoRequest) GetUserID() int32 {
+func (x *GetUserInfoRequest) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -77,7 +77,7 @@ type GetUserInfoResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	AvatarPath    string                 `protobuf:"bytes,2,opt,name=avatarPath,proto3" json:"avatarPath,omitempty"`
-	UserID        int32                  `protobuf:"varint,3,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,3,opt,name=userID,proto3" json:"userID,omitempty"`
 	Login         string                 `protobuf:"bytes,4,opt,name=login,proto3" json:"login,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -127,7 +127,7 @@ func (x *GetUserInfoResponse) GetAvatarPath() string {
 	return ""
 }
 
-func (x *GetUserInfoResponse) GetUserID() int32 {
+func (x *GetUserInfoResponse) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -195,7 +195,7 @@ func (x *AuthRequest) GetPassword() string {
 
 type AuthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        int32                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	UserName      string                 `protobuf:"bytes,2,opt,name=userName,proto3" json:"userName,omitempty"`
 	AvatarPath    string                 `protobuf:"bytes,3,opt,name=avatarPath,proto3" json:"avatarPath,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -232,7 +232,7 @@ func (*AuthResponse) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *AuthResponse) GetUserID() int32 {
+func (x *AuthResponse) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -323,7 +323,7 @@ func (x *RegisterRequest) GetInterests() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        int32                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -358,7 +358,7 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *RegisterResponse) GetUserID() int32 {
+func (x *RegisterResponse) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -368,7 +368,7 @@ func (x *RegisterResponse) GetUserID() int32 {
 type AddAvatarRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AvatarPath    string                 `protobuf:"bytes,1,opt,name=avatarPath,proto3" json:"avatarPath,omitempty"`
-	UserID        int32                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -410,7 +410,7 @@ func (x *AddAvatarRequest) GetAvatarPath() string {
 	return ""
 }
 
-func (x *AddAvatarRequest) GetUserID() int32 {
+func (x *AddAvatarRequest) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -455,7 +455,7 @@ func (*AddAvatarResponse) Descriptor() ([]byte, []int) {
 
 type DeleteUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        int32                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -490,7 +490,7 @@ func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *DeleteUserRequest) GetUserID() int32 {
+func (x *DeleteUserRequest) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -579,7 +579,7 @@ func (x *GetUserIDRequest) GetLogin() string {
 
 type GetUserIDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            int32                  `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	ID            int64                  `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -614,7 +614,7 @@ func (*GetUserIDResponse) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetUserIDResponse) GetID() int32 {
+func (x *GetUserIDResponse) GetID() int64 {
 	if x != nil {
 		return x.ID
 	}
@@ -628,19 +628,19 @@ const file_users_proto_rawDesc = "" +
 	"\vusers.proto\x12\x05users\"J\n" +
 	"\x12GetUserInfoRequest\x12\x1c\n" +
 	"\tuserLogin\x18\x01 \x01(\tR\tuserLogin\x12\x16\n" +
-	"\x06userID\x18\x02 \x01(\x05R\x06userID\"w\n" +
+	"\x06userID\x18\x02 \x01(\x03R\x06userID\"w\n" +
 	"\x13GetUserInfoResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1e\n" +
 	"\n" +
 	"avatarPath\x18\x02 \x01(\tR\n" +
 	"avatarPath\x12\x16\n" +
-	"\x06userID\x18\x03 \x01(\x05R\x06userID\x12\x14\n" +
+	"\x06userID\x18\x03 \x01(\x03R\x06userID\x12\x14\n" +
 	"\x05login\x18\x04 \x01(\tR\x05login\"?\n" +
 	"\vAuthRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"b\n" +
 	"\fAuthResponse\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\x05R\x06userID\x12\x1a\n" +
+	"\x06userID\x18\x01 \x01(\x03R\x06userID\x12\x1a\n" +
 	"\buserName\x18\x02 \x01(\tR\buserName\x12\x1e\n" +
 	"\n" +
 	"avatarPath\x18\x03 \x01(\tR\n" +
@@ -651,20 +651,20 @@ const file_users_proto_rawDesc = "" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x1c\n" +
 	"\tinterests\x18\x04 \x01(\tR\tinterests\"*\n" +
 	"\x10RegisterResponse\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\x05R\x06userID\"J\n" +
+	"\x06userID\x18\x01 \x01(\x03R\x06userID\"J\n" +
 	"\x10AddAvatarRequest\x12\x1e\n" +
 	"\n" +
 	"avatarPath\x18\x01 \x01(\tR\n" +
 	"avatarPath\x12\x16\n" +
-	"\x06userID\x18\x02 \x01(\x05R\x06userID\"\x13\n" +
+	"\x06userID\x18\x02 \x01(\x03R\x06userID\"\x13\n" +
 	"\x11AddAvatarResponse\"+\n" +
 	"\x11DeleteUserRequest\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\x05R\x06userID\"\x14\n" +
+	"\x06userID\x18\x01 \x01(\x03R\x06userID\"\x14\n" +
 	"\x12DeleteUserResponse\"(\n" +
 	"\x10GetUserIDRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\"#\n" +
 	"\x11GetUserIDResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\x05R\x02ID2\xfe\x02\n" +
+	"\x02ID\x18\x01 \x01(\x03R\x02ID2\xfe\x02\n" +
 	"\x05Users\x12D\n" +
 	"\vGetUserInfo\x12\x19.users.GetUserInfoRequest\x1a\x1a.users.GetUserInfoResponse\x12/\n" +
 	"\x04Auth\x12\x12.users.AuthRequest\x1a\x13.users.AuthResponse\x12;\n" +

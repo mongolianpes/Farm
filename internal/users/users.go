@@ -115,7 +115,7 @@ func GetUserInfo(id int, login string) (result userInfo, err error) {
 	var resp *pb.GetUserInfoResponse
 	resp, err = client.service.GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		UserLogin: login,
-		UserID:    int32(id),
+		UserID:    int64(id),
 	})
 	if err != nil {
 		slog.Warn("Не удалось получить данный профиля пользователя", "login", login, "error", err)

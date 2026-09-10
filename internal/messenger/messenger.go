@@ -11,9 +11,9 @@ import (
 
 func (c *Client) SendMessege(ctx context.Context, senderID, receivedID, relatedAnnouncementID int, messageText string) error {
 	_, err := c.service.SendMessage(ctx, &pb.SendMessageRequest{
-		ReceivedID:            int32(receivedID),
-		SenderID:              int32(senderID),
-		RelatedAnnouncementID: int32(relatedAnnouncementID),
+		ReceivedID:            int64(receivedID),
+		SenderID:              int64(senderID),
+		RelatedAnnouncementID: int64(relatedAnnouncementID),
 		Text:                  messageText,
 	})
 	if err != nil {
@@ -33,7 +33,7 @@ type ChatInfo struct {
 
 func (c *Client) GetUserChats(ctx context.Context, userID int) ([]*ChatInfo, error) {
 	resp, err := c.service.GetChats(ctx, &pb.GetChatsRequest{
-		UserID: int32(userID),
+		UserID: int64(userID),
 	})
 	if err != nil {
 		slog.Warn("Ошибка при получении чатов пользователей", "error", err)
@@ -61,10 +61,10 @@ type message struct {
 
 func (c *Client) GetChatHistory(ctx context.Context, userID, partnerID, relatedAnnouncementID, offset int) ([]*message, error) {
 	resp, err := c.service.GetChatHistory(ctx, &pb.GetChatHistoryRequest{
-		PartnerID:             int32(partnerID),
-		UserID:                int32(userID),
-		RelatedAnnouncementID: int32(relatedAnnouncementID),
-		Offset:                int32(offset),
+		PartnerID:             int64(partnerID),
+		UserID:                int64(userID),
+		RelatedAnnouncementID: int64(relatedAnnouncementID),
+		Offset:                int64(offset),
 	})
 	if err != nil {
 		slog.Warn("Ошибка при получении истории чата", "error", err)

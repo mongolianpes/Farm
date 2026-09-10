@@ -26,8 +26,8 @@ func sendReqDeleteAnnouncement(announcementID, userID int) error {
 	defer cancel()
 
 	_, err := client.service.DeleteAnnouncement(ctx, &pb.DeleteAnnouncementRequest{
-		AnnouncementID: int32(announcementID),
-		UserID:         int32(userID),
+		AnnouncementID: int64(announcementID),
+		UserID:         int64(userID),
 	})
 	if err != nil {
 		return err

@@ -6,13 +6,13 @@ option go_package = ".";
 
 message GetUserInfoRequest {
   string userLogin = 1;
-  int32 userID = 2;
+  int64 userID = 2;
 }
 
 message GetUserInfoResponse {
   string name = 1;
   string avatarPath = 2;
-  int32 userID = 3;
+  int64 userID = 3;
   string login = 4;
 }
 
@@ -22,7 +22,7 @@ message AuthRequest {
 }
 
 message AuthResponse {
-  int32 userID = 1;
+  int64 userID = 1;
   string userName = 2;
   string avatarPath = 3;
 }
@@ -35,18 +35,18 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-  int32 userID = 1;
+  int64 userID = 1;
 }
 
 message AddAvatarRequest {
   string avatarPath = 1;
-  int32 userID = 2;
+  int64 userID = 2;
 }
 
 message AddAvatarResponse {}
 
 message DeleteUserRequest {
-  int32 userID = 1;
+  int64 userID = 1;
 }
 
 message DeleteUserResponse {}
@@ -56,7 +56,7 @@ message GetUserIDRequest {
 }
 
 message GetUserIDResponse {
-  int32 ID = 1;
+  int64 ID = 1;
 }
 
 service Users {

@@ -41,12 +41,12 @@ func SearchAnnouncements(rdb rdb.DB, offset, userID, authorID int, SearchString,
 	}
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
-		Offset:       int32(offset),
-		UserID:       int32(userID),
+		Offset:       int64(offset),
+		UserID:       int64(userID),
 		SearchString: SearchString,
 		Category:     category,
 		Orderby:      orderBy,
-		AuthorID:     int32(authorID),
+		AuthorID:     int64(authorID),
 	})
 	if err != nil {
 		slog.Warn("Не удалось получить список объявлений", "error", err)
@@ -96,8 +96,8 @@ func GetAnnouncementInfo(rdb rdb.DB, announcementID, userID int) (models.Announc
 	}
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{
-		AnnouncementID: int32(announcementID),
-		UserID:         int32(userID),
+		AnnouncementID: int64(announcementID),
+		UserID:         int64(userID),
 	})
 	if err != nil {
 		slog.Warn("Не удалось получить объявление", "announcementID", announcementID, "userID", userID, "error", err)

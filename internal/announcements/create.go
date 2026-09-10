@@ -35,14 +35,14 @@ func CreateAnnouncement(userID int, title, description, category string, images 
 		}
 	}
 
-	announcementID, err := sendReqCreateAnnouncement(int32(userID), title, description, category)
+	announcementID, err := sendReqCreateAnnouncement(int64(userID), title, description, category)
 	if err != nil {
 		slog.Warn("Не удалось создать объявление", "announcementID", announcementID, "userID", userID, "error", err)
 		return err
 	}
 
 	if len(images) >= 1 {
-		if err := sendReqAddImages(images, announcementID, int32(userID)); err != nil {
+		if err := sendReqAddImages(images, announcementID, int64(userID)); err != nil {
 			slog.Warn("Не удалось создать объявление, поскольку не удалось загрузить картинки", "announcementID", announcementID, "userID", userID, "error", err)
 			return err
 		}
@@ -53,7 +53,7 @@ func CreateAnnouncement(userID int, title, description, category string, images 
 	return nil
 }
 
-func sendReqCreateAnnouncement(authorID int32, title, description, category string) (int32, error) {
+func sendReqCreateAnnouncement(authorID int64, title, description, category string) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
@@ -70,7 +70,7 @@ func sendReqCreateAnnouncement(authorID int32, title, description, category stri
 	return respCreate.AnnouncementID, nil
 }
 
-func sendReqAddImages(images []*multipart.FileHeader, announcementdID, userID int32) error {
+func sendReqAddImages(images []*multipart.FileHeader, announcementdID, userID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 

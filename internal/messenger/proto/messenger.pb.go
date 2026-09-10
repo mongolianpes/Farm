@@ -24,7 +24,7 @@ const (
 
 type GetChatsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        int32                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        int64                  `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -59,7 +59,7 @@ func (*GetChatsRequest) Descriptor() ([]byte, []int) {
 	return file_messenger_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetChatsRequest) GetUserID() int32 {
+func (x *GetChatsRequest) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
@@ -112,11 +112,11 @@ func (x *GetChatsResponse) GetChats() []*ChatInfo {
 
 type ChatInfo struct {
 	state                    protoimpl.MessageState `protogen:"open.v1"`
-	PartnerID                int32                  `protobuf:"varint,1,opt,name=partnerID,proto3" json:"partnerID,omitempty"`
+	PartnerID                int64                  `protobuf:"varint,1,opt,name=partnerID,proto3" json:"partnerID,omitempty"`
 	PartnerName              string                 `protobuf:"bytes,2,opt,name=partnerName,proto3" json:"partnerName,omitempty"`
 	RelatedAnnouncementTitle string                 `protobuf:"bytes,3,opt,name=relatedAnnouncementTitle,proto3" json:"relatedAnnouncementTitle,omitempty"`
 	PartnerAvatarPath        string                 `protobuf:"bytes,4,opt,name=partnerAvatarPath,proto3" json:"partnerAvatarPath,omitempty"`
-	RelatedAnnouncementID    int32                  `protobuf:"varint,5,opt,name=relatedAnnouncementID,proto3" json:"relatedAnnouncementID,omitempty"`
+	RelatedAnnouncementID    int64                  `protobuf:"varint,5,opt,name=relatedAnnouncementID,proto3" json:"relatedAnnouncementID,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
 }
@@ -151,7 +151,7 @@ func (*ChatInfo) Descriptor() ([]byte, []int) {
 	return file_messenger_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ChatInfo) GetPartnerID() int32 {
+func (x *ChatInfo) GetPartnerID() int64 {
 	if x != nil {
 		return x.PartnerID
 	}
@@ -179,7 +179,7 @@ func (x *ChatInfo) GetPartnerAvatarPath() string {
 	return ""
 }
 
-func (x *ChatInfo) GetRelatedAnnouncementID() int32 {
+func (x *ChatInfo) GetRelatedAnnouncementID() int64 {
 	if x != nil {
 		return x.RelatedAnnouncementID
 	}
@@ -188,9 +188,9 @@ func (x *ChatInfo) GetRelatedAnnouncementID() int32 {
 
 type SendMessageRequest struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
-	ReceivedID            int32                  `protobuf:"varint,1,opt,name=receivedID,proto3" json:"receivedID,omitempty"`
-	SenderID              int32                  `protobuf:"varint,2,opt,name=senderID,proto3" json:"senderID,omitempty"`
-	RelatedAnnouncementID int32                  `protobuf:"varint,3,opt,name=relatedAnnouncementID,proto3" json:"relatedAnnouncementID,omitempty"`
+	ReceivedID            int64                  `protobuf:"varint,1,opt,name=receivedID,proto3" json:"receivedID,omitempty"`
+	SenderID              int64                  `protobuf:"varint,2,opt,name=senderID,proto3" json:"senderID,omitempty"`
+	RelatedAnnouncementID int64                  `protobuf:"varint,3,opt,name=relatedAnnouncementID,proto3" json:"relatedAnnouncementID,omitempty"`
 	Text                  string                 `protobuf:"bytes,4,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
@@ -226,21 +226,21 @@ func (*SendMessageRequest) Descriptor() ([]byte, []int) {
 	return file_messenger_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SendMessageRequest) GetReceivedID() int32 {
+func (x *SendMessageRequest) GetReceivedID() int64 {
 	if x != nil {
 		return x.ReceivedID
 	}
 	return 0
 }
 
-func (x *SendMessageRequest) GetSenderID() int32 {
+func (x *SendMessageRequest) GetSenderID() int64 {
 	if x != nil {
 		return x.SenderID
 	}
 	return 0
 }
 
-func (x *SendMessageRequest) GetRelatedAnnouncementID() int32 {
+func (x *SendMessageRequest) GetRelatedAnnouncementID() int64 {
 	if x != nil {
 		return x.RelatedAnnouncementID
 	}
@@ -292,10 +292,10 @@ func (*SendMessageResponse) Descriptor() ([]byte, []int) {
 
 type GetChatHistoryRequest struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
-	PartnerID             int32                  `protobuf:"varint,1,opt,name=partnerID,proto3" json:"partnerID,omitempty"`
-	UserID                int32                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
-	RelatedAnnouncementID int32                  `protobuf:"varint,3,opt,name=relatedAnnouncementID,proto3" json:"relatedAnnouncementID,omitempty"`
-	Offset                int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	PartnerID             int64                  `protobuf:"varint,1,opt,name=partnerID,proto3" json:"partnerID,omitempty"`
+	UserID                int64                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	RelatedAnnouncementID int64                  `protobuf:"varint,3,opt,name=relatedAnnouncementID,proto3" json:"relatedAnnouncementID,omitempty"`
+	Offset                int64                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
@@ -330,28 +330,28 @@ func (*GetChatHistoryRequest) Descriptor() ([]byte, []int) {
 	return file_messenger_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetChatHistoryRequest) GetPartnerID() int32 {
+func (x *GetChatHistoryRequest) GetPartnerID() int64 {
 	if x != nil {
 		return x.PartnerID
 	}
 	return 0
 }
 
-func (x *GetChatHistoryRequest) GetUserID() int32 {
+func (x *GetChatHistoryRequest) GetUserID() int64 {
 	if x != nil {
 		return x.UserID
 	}
 	return 0
 }
 
-func (x *GetChatHistoryRequest) GetRelatedAnnouncementID() int32 {
+func (x *GetChatHistoryRequest) GetRelatedAnnouncementID() int64 {
 	if x != nil {
 		return x.RelatedAnnouncementID
 	}
 	return 0
 }
 
-func (x *GetChatHistoryRequest) GetOffset() int32 {
+func (x *GetChatHistoryRequest) GetOffset() int64 {
 	if x != nil {
 		return x.Offset
 	}
@@ -468,28 +468,28 @@ const file_messenger_proto_rawDesc = "" +
 	"\n" +
 	"\x0fmessenger.proto\x12\tmessenger\x1a\x0ftimestamp.proto\")\n" +
 	"\x0fGetChatsRequest\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\x05R\x06userID\"=\n" +
+	"\x06userID\x18\x01 \x01(\x03R\x06userID\"=\n" +
 	"\x10GetChatsResponse\x12)\n" +
 	"\x05chats\x18\x01 \x03(\v2\x13.messenger.ChatInfoR\x05chats\"\xea\x01\n" +
 	"\bChatInfo\x12\x1c\n" +
-	"\tpartnerID\x18\x01 \x01(\x05R\tpartnerID\x12 \n" +
+	"\tpartnerID\x18\x01 \x01(\x03R\tpartnerID\x12 \n" +
 	"\vpartnerName\x18\x02 \x01(\tR\vpartnerName\x12:\n" +
 	"\x18relatedAnnouncementTitle\x18\x03 \x01(\tR\x18relatedAnnouncementTitle\x12,\n" +
 	"\x11partnerAvatarPath\x18\x04 \x01(\tR\x11partnerAvatarPath\x124\n" +
-	"\x15relatedAnnouncementID\x18\x05 \x01(\x05R\x15relatedAnnouncementID\"\x9a\x01\n" +
+	"\x15relatedAnnouncementID\x18\x05 \x01(\x03R\x15relatedAnnouncementID\"\x9a\x01\n" +
 	"\x12SendMessageRequest\x12\x1e\n" +
 	"\n" +
-	"receivedID\x18\x01 \x01(\x05R\n" +
+	"receivedID\x18\x01 \x01(\x03R\n" +
 	"receivedID\x12\x1a\n" +
-	"\bsenderID\x18\x02 \x01(\x05R\bsenderID\x124\n" +
-	"\x15relatedAnnouncementID\x18\x03 \x01(\x05R\x15relatedAnnouncementID\x12\x12\n" +
+	"\bsenderID\x18\x02 \x01(\x03R\bsenderID\x124\n" +
+	"\x15relatedAnnouncementID\x18\x03 \x01(\x03R\x15relatedAnnouncementID\x12\x12\n" +
 	"\x04text\x18\x04 \x01(\tR\x04text\"\x15\n" +
 	"\x13SendMessageResponse\"\x9b\x01\n" +
 	"\x15GetChatHistoryRequest\x12\x1c\n" +
-	"\tpartnerID\x18\x01 \x01(\x05R\tpartnerID\x12\x16\n" +
-	"\x06userID\x18\x02 \x01(\x05R\x06userID\x124\n" +
-	"\x15relatedAnnouncementID\x18\x03 \x01(\x05R\x15relatedAnnouncementID\x12\x16\n" +
-	"\x06offset\x18\x04 \x01(\x05R\x06offset\"V\n" +
+	"\tpartnerID\x18\x01 \x01(\x03R\tpartnerID\x12\x16\n" +
+	"\x06userID\x18\x02 \x01(\x03R\x06userID\x124\n" +
+	"\x15relatedAnnouncementID\x18\x03 \x01(\x03R\x15relatedAnnouncementID\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x03R\x06offset\"V\n" +
 	"\x16GetChatHistoryResponse\x12<\n" +
 	"\bmessages\x18\x01 \x03(\v2 .messenger.GetChatHistoryMessageR\bmessages\"\x81\x01\n" +
 	"\x15GetChatHistoryMessage\x12\x12\n" +
