@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -17,7 +16,7 @@ func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
-	data, err := getAnnouncementsByParameters(ctx, h.DB, h.RedisDB, w, r)
+	data, err := getAnnouncementsByParameters(ctx, h.RedisDB, w, r)
 	if err != nil {
 		if err == session.ErrUserHaveNotSession {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
@@ -41,7 +40,7 @@ func (h *Handler) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*models.AnnouncementData, error) {
+func getAnnouncementsByParameters(ctx context.Context, rdb rdb.DB, w http.ResponseWriter, r *http.Request) ([]*models.AnnouncementData, error) {
 	var offsetInt int
 	var err error
 	data := []*models.AnnouncementData{}
@@ -66,7 +65,7 @@ func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w
 				return data, err
 			}
 			var newSession string
-			newSession, userIDInt, _ = session.GetUserID(ctx, db, rdb, sessionID)
+			newSession, userIDInt, _ = session.GetUserID(ctx, rdb, sessionID)
 			if newSession != "" {
 				session.SetCookie(w, newSession)
 			}
@@ -90,7 +89,7 @@ func getAnnouncementsByParameters(ctx context.Context, db *sql.DB, rdb rdb.DB, w
 				return data, err
 			}
 			var newSession string
-			newSession, authorIDInt, err = session.GetUserID(ctx, db, rdb, sessionID)
+			newSession, authorIDInt, err = session.GetUserID(ctx, rdb, sessionID)
 			if err != nil {
 				return data, err
 			}

@@ -84,8 +84,8 @@ type ImageInfo struct {
 	Compress  string  `protobuf:"bytes,1,opt,name=compress,proto3" json:"compress,omitempty"`     // сжатие
 	Watermark string  `protobuf:"bytes,2,opt,name=watermark,proto3" json:"watermark,omitempty"`   // вотермарк
 	Format    string  `protobuf:"bytes,3,opt,name=format,proto3" json:"format,omitempty"`         // перевод в формат файла
-	Width     []int64 `protobuf:"varint,4,rep,packed,name=width,proto3" json:"width,omitempty"`   // ширина обработанной картинки
-	Height    []int64 `protobuf:"varint,5,rep,packed,name=height,proto3" json:"height,omitempty"` // высота обработанной картинки
+	Width     []int32 `protobuf:"varint,4,rep,packed,name=width,proto3" json:"width,omitempty"`   // ширина обработанной картинки
+	Height    []int32 `protobuf:"varint,5,rep,packed,name=height,proto3" json:"height,omitempty"` // высота обработанной картинки
 }
 
 func (x *ImageInfo) Reset() {
@@ -141,14 +141,14 @@ func (x *ImageInfo) GetFormat() string {
 	return ""
 }
 
-func (x *ImageInfo) GetWidth() []int64 {
+func (x *ImageInfo) GetWidth() []int32 {
 	if x != nil {
 		return x.Width
 	}
 	return nil
 }
 
-func (x *ImageInfo) GetHeight() []int64 {
+func (x *ImageInfo) GetHeight() []int32 {
 	if x != nil {
 		return x.Height
 	}
@@ -267,7 +267,7 @@ var file_image_proto_goTypes = []interface{}{
 	(*ImageInfo)(nil),              // 1: main.ImageInfo
 	(*DownloadImagesResponse)(nil), // 2: main.DownloadImagesResponse
 }
-var file_image_proto_depIdxs = []int64{
+var file_image_proto_depIdxs = []int32{
 	1, // 0: main.DownloadImagesRequest.info:type_name -> main.ImageInfo
 	0, // 1: main.ImageService.DownloadImages:input_type -> main.DownloadImagesRequest
 	2, // 2: main.ImageService.DownloadImages:output_type -> main.DownloadImagesResponse

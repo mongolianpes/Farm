@@ -40,7 +40,7 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
 	}
-	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	newSession, userID, err := session.GetUserID(ctx, h.RedisDB, sessionID)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
@@ -80,7 +80,7 @@ func (h *Handler) AnnouncementsPageHandler(w http.ResponseWriter, r *http.Reques
 
 	var err error
 	data := AnnouncementsData{}
-	data.Announcements, err = getAnnouncementsByParameters(ctx, h.DB, h.RedisDB, w, r)
+	data.Announcements, err = getAnnouncementsByParameters(ctx, h.RedisDB, w, r)
 	if err != nil {
 		if err == session.ErrUserHaveNotSession {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
@@ -102,7 +102,7 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, ct
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
 	}
-	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	newSession, userID, err := session.GetUserID(ctx, h.RedisDB, sessionID)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
@@ -152,7 +152,7 @@ func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
 	}
-	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	newSession, userID, err := session.GetUserID(ctx, h.RedisDB, sessionID)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 	}

@@ -52,7 +52,7 @@ func CloseConnectionToService() error {
 	return client.conn.Close()
 }
 
-func SaveImage(width, height int64, file multipart.File) (string, error) {
+func SaveImage(width, height int32, file multipart.File) (string, error) {
 	if err := initService(); err != nil {
 		return "", err
 	}
@@ -81,8 +81,8 @@ func SaveImage(width, height int64, file multipart.File) (string, error) {
 	}
 
 	if width != 0 && height != 0 {
-		req.Info.Width = []int64{width}
-		req.Info.Height = []int64{height}
+		req.Info.Width = []int32{width}
+		req.Info.Height = []int32{height}
 	}
 
 	if err := stream.Send(req); err != nil {

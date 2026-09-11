@@ -1,10 +1,7 @@
 package handlers
 
 import (
-	"database/sql"
-	"fmt"
 	"html/template"
-	"os"
 	"time"
 
 	"project-farm/internal/messenger"
@@ -13,7 +10,6 @@ import (
 
 type Handler struct {
 	Tmpl      *template.Template
-	DB        *sql.DB
 	RedisDB   rdb.DB
 	Messenger messenger.Messenger
 }
@@ -23,34 +19,6 @@ const timeToCompleteRequest = 30 * time.Second
 const htmlPages = "./htmlPages/*.html"
 
 func NewHand() *Handler {
-	// host := "localhost"
-	// port := "5432"
-	// user := "postgres"
-	// password := "123"
-	// dbname := "project_farm"
-
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(10)
-	db.SetConnMaxLifetime(30 * time.Minute)
-	db.SetConnMaxIdleTime(5 * time.Minute)
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
 	rdb, err := rdb.NewClient("rdb:6379")
 	if err != nil {
 		panic(err)
@@ -68,7 +36,6 @@ func NewHand() *Handler {
 
 	return &Handler{
 		Tmpl:      tmpl,
-		DB:        db,
 		RedisDB:   rdb,
 		Messenger: messenger,
 	}

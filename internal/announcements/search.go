@@ -22,22 +22,24 @@ func SearchAnnouncements(rdb rdb.DB, offset, userID, authorID int, SearchString,
 
 	result := []*models.AnnouncementData{}
 
-	savedAnnouncementIDs, err := rdb.GetAnnouncementsIDsForUser(ctx, strconv.Itoa(userID))
-	if err == nil && len(savedAnnouncementIDs) != 0 {
-		for _, id := range savedAnnouncementIDs {
-			idStr, err := strconv.Atoi(id)
-			if err != nil {
-				break
-			}
-			announcement, err := rdb.GetAnnouncementInfo(ctx, idStr)
-			if err != nil {
-				break
+	if offset == 0 {
+		savedAnnouncementIDs, err := rdb.GetAnnouncementsIDsForUser(ctx, strconv.Itoa(userID))
+		if err == nil && len(savedAnnouncementIDs) != 0 {
+			for _, id := range savedAnnouncementIDs {
+				idStr, err := strconv.Atoi(id)
+				if err != nil {
+					break
+				}
+				announcement, err := rdb.GetAnnouncementInfo(ctx, idStr)
+				if err != nil {
+					break
+				}
+
+				result = append(result, announcement)
 			}
 
-			result = append(result, announcement)
+			return result, nil
 		}
-
-		return result, nil
 	}
 
 	resp, err := client.service.SearchAnnouncements(ctx, &pb.SearchAnnouncementsRequest{

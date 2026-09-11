@@ -8,7 +8,6 @@ import (
 
 	pb "project-farm/internal/users/proto"
 
-	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

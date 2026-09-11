@@ -8,6 +8,7 @@ import (
 	"project-farm/internal/images"
 	"project-farm/internal/messenger"
 	"project-farm/internal/session"
+	"project-farm/internal/users"
 )
 
 const (
@@ -40,7 +41,7 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
 		}
-		newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+		newSession, userID, err := session.GetUserID(ctx, h.RedisDB, sessionID)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
 			return
@@ -57,10 +58,18 @@ func (h *Handler) MessengerHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		pageData.PartnerID = partnerID
 
-		if err := h.DB.QueryRow("SELECT name, avatar_path FROM users WHERE user_id = $1", partnerID).Scan(&pageData.Name, &pageData.PartnerAvatar); err != nil {
+		partnerIDInt, err := strconv.Atoi(partnerID)
+		if err != nil {
 			http.Error(w, "Не удалось получить партнера", http.StatusInternalServerError)
 			return
 		}
+		userInfo, err := users.GetUserInfo(partnerIDInt, "")
+		if err != nil {
+			http.Error(w, "Не удалось получить партнера", http.StatusInternalServerError)
+			return
+		}
+		pageData.Name = userInfo.Name
+		pageData.PartnerAvatar = userInfo.AvatarPath
 
 		relatedAnnouncementID := r.URL.Query().Get("relatedannouncementid")
 		pageData.RelatedAnnouncementID = relatedAnnouncementID
@@ -84,7 +93,7 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
 	}
-	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	newSession, userID, err := session.GetUserID(ctx, h.RedisDB, sessionID)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
@@ -115,7 +124,7 @@ func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return
 	}
-	newSession, userID, err := session.GetUserID(ctx, h.DB, h.RedisDB, sessionID)
+	newSession, userID, err := session.GetUserID(ctx, h.RedisDB, sessionID)
 	if err != nil {
 		http.Redirect(w, r, "/auth", http.StatusSeeOther)
 		return

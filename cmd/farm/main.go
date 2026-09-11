@@ -12,7 +12,6 @@ import (
 	"project-farm/internal/announcements"
 	"project-farm/internal/handlers"
 	"project-farm/internal/images"
-	"project-farm/internal/session"
 	"project-farm/internal/users"
 )
 
@@ -22,9 +21,7 @@ const (
 
 func main() {
 	hand := handlers.NewHand()
-	defer hand.DB.Close()
-
-	go session.OldSessionsRemover(hand.DB)
+	defer hand.RedisDB.Close()
 
 	mux := http.NewServeMux()
 
@@ -83,9 +80,5 @@ func main() {
 
 	if err := users.CloseConnectionToService(); err != nil {
 		slog.Error("Не удалось разорвать соединение с микросервисом Users", "error", err)
-	}
-
-	if err := hand.DB.Close(); err != nil {
-		slog.Error("Не удалось разоврвать соединение с базой данных", "error", err)
 	}
 }
