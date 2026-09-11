@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"project-farm/internal/models"
 )
@@ -22,10 +23,16 @@ const (
 
 const (
 	redisKeyPrefixAnnouncementInfo = "ann_%v"
+	timeToSaveAnnouncementsInRedis = time.Minute * 30
 )
 
 func (c *Client) SaveAnnouncementIDsForUser(ctx context.Context, announcements []interface{}, userID string) error {
 	if err := c.rdb.RPush(ctx, userID, announcements...).Err(); err != nil {
+		return err
+	}
+
+	if err := c.rdb.Expire(ctx, userID, timeToSaveSessionInRedis).Err(); err != nil {
+		c.rdb.Del(ctx, userID)
 		return err
 	}
 
@@ -47,7 +54,8 @@ func (c *Client) SaveAnnouncementInfo(ctx context.Context, announcementInfo mode
 		return err
 	}
 
-	if err := c.rdb.HSet(ctx, fmt.Sprintf(redisKeyPrefixAnnouncementInfo, announcementInfo.AnnouncementID), map[string]interface{}{
+	key := fmt.Sprintf(redisKeyPrefixAnnouncementInfo, announcementInfo.AnnouncementID)
+	if err := c.rdb.HSet(ctx, key, map[string]interface{}{
 		redisKeyAuthorName:         announcementInfo.AuthorName,
 		redisKeyAuthorID:           announcementInfo.AuthorID,
 		redisKeyTitle:              announcementInfo.Title,
@@ -56,6 +64,11 @@ func (c *Client) SaveAnnouncementInfo(ctx context.Context, announcementInfo mode
 		redisKeyLinkToAnnouncement: announcementInfo.LinkToAnnouncement,
 		redisKeyImages:             imagesJSON,
 	}).Err(); err != nil {
+		return err
+	}
+
+	if err := c.rdb.Expire(ctx, key, timeToSaveSessionInRedis).Err(); err != nil {
+		c.rdb.Del(ctx, key)
 		return err
 	}
 
