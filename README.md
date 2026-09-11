@@ -16,11 +16,11 @@
 
 ## Переменные окужения
 Для корректной работы необходимы переменные окружения:
-DB_HOST - адрес БД\n
-DB_PORT - порт БД
-DB_USER - пользователей БД
-DB_PASSWORD - пароль пользователя БД
-DB_NAME - название БД
+DB_HOST - адрес БД<br>
+DB_PORT - порт БД<br>
+DB_USER - пользователей БД<br>
+DB_PASSWORD - пароль пользователя БД<br>
+DB_NAME - название БД<br>
 ANNOUNCEMENTS_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Announcements для взаимодействия по gRPC
 IMAGES_SERVICE_EXTERNAL_CONNECTIONS - адрес и порт микросервиса Images для внешний подключений (получение картинок)
 IMAGES_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Images для взаимодействия по gRPC
