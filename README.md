@@ -16,23 +16,23 @@
 
 ## Переменные окужения
 Для корректной работы необходимы переменные окружения:
-DB_HOST - адрес БД
-DB_PORT - порт БД
-DB_USER - пользователей БД
-DB_PASSWORD - пароль пользователя БД
-DB_NAME - название БД
-ANNOUNCEMENTS_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Announcements для взаимодействия по gRPC
-IMAGES_SERVICE_EXTERNAL_CONNECTIONS - адрес и порт микросервиса Images для внешний подключений (получение картинок)
-IMAGES_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Images для взаимодействия по gRPC
-MESSENGER_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Messenger для взаимодействия по gRPC
-USERS_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Users для взаимодействия по gRPC
+DB_HOST - адрес БД<br>
+DB_PORT - порт БД<br>
+DB_USER - пользователей БД<br>
+DB_PASSWORD - пароль пользователя БД<br>
+DB_NAME - название БД<br>
+ANNOUNCEMENTS_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Announcements для взаимодействия по gRPC<br>
+IMAGES_SERVICE_EXTERNAL_CONNECTIONS - адрес и порт микросервиса Images для внешний подключений (получение картинок)<br>
+IMAGES_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Images для взаимодействия по gRPC<br>
+MESSENGER_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Messenger для взаимодействия по gRPC<br>
+USERS_SERVICE_HOST_GRPC_PORT - адрес и порт микросервиса Users для взаимодействия по gRPC<br>
 
 ## Сборка и запуск
-Для запуска сайта необохдимо использователь Docker. 
-Установите Docker в случае если он не имеется
-Поместите код репозитории всех микросервисов в одну директории, в том числе и осовной. В данный директории разместите docker-compose.yml файл (необходимо взять из docs/docker-compose.yml).
-Также создайте скопируйте директори docs/db в корень проекта.
-Запустите 
+Для запуска сайта необохдимо использователь Docker.<br>
+Установите Docker в случае если он не имеется<br>
+Поместите код репозитории всех микросервисов в одну директории, в том числе и осовной. В данный директории разместите docker-compose.yml файл (необходимо взять из docs/docker-compose.yml).<br>
+Также создайте скопируйте директори docs/db в корень проекта.<br>
+Запустите:
 ```
 docker compose -d --build
 ```
