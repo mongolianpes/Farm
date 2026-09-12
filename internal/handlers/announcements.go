@@ -9,6 +9,7 @@ import (
 	"project-farm/internal/images"
 	"project-farm/internal/models"
 	"project-farm/internal/session"
+	"project-farm/internal/users"
 )
 
 type CreateAnnouncementData struct {
@@ -55,7 +56,7 @@ func (h *Handler) CreateAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 	category := r.FormValue("category")
 	images := r.MultipartForm.File["images"]
 
-	if err := announcements.CreateAnnouncement(userID, title, description, category, images); err != nil {
+	if err := announcements.CreateAnnouncement(h.RedisDB, userID, title, description, category, images); err != nil {
 		data.Description = description
 		data.Title = title
 		data.Category = category
@@ -116,6 +117,13 @@ func (h *Handler) showOneAnnouncement(w http.ResponseWriter, r *http.Request, ct
 		announcementInfo.Description = "Произошла ошибка " + err.Error()
 	}
 
+	announcementAuthorInfo, err := users.GetUserInfo(announcementInfo.AuthorID, "")
+	if err != nil {
+		announcementInfo.AuthorName = "Неизвестно"
+	} else {
+		announcementInfo.AuthorName = announcementAuthorInfo.Name
+	}
+
 	data := AnnouncementsData{
 		Announcements: []*models.AnnouncementData{},
 	}
@@ -160,7 +168,7 @@ func (h *Handler) DeleteAnnouncementHandler(w http.ResponseWriter, r *http.Reque
 		session.SetCookie(w, newSession)
 	}
 
-	if err := announcements.DeleteAnnouncement(id, userID); err != nil {
+	if err := announcements.DeleteAnnouncement(h.RedisDB, id, userID); err != nil {
 		http.Redirect(w, r, "/profile?login=my", http.StatusSeeOther)
 		return
 	}

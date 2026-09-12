@@ -106,5 +106,14 @@ func getAnnouncementsByParameters(ctx context.Context, rdb rdb.DB, w http.Respon
 		return data, err
 	}
 
+	for _, announcement := range data {
+		announcementAuthorInfo, err := users.GetUserInfo(announcement.AuthorID, "")
+		if err != nil {
+			announcement.AuthorName = "Неизвестно"
+		} else {
+			announcement.AuthorName = announcementAuthorInfo.Name
+		}
+	}
+
 	return data, nil
 }

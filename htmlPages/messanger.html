@@ -365,8 +365,8 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             text: text,
-                            receiveduserid: partnerID,
-                            relatedannouncementid: {{.RelatedAnnouncementID}}
+                            receiveduserid: Number(partnerID),
+                            relatedannouncementid: Number({{.RelatedAnnouncementID}})
                         })
                     });
 

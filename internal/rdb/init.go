@@ -20,6 +20,7 @@ type DB interface {
 	GetAnnouncementsIDsForUser(ctx context.Context, userID string) ([]string, error)
 	SaveAnnouncementInfo(ctx context.Context, announcementInfo models.AnnouncementData) error
 	GetAnnouncementInfo(ctx context.Context, announcementID int) (*models.AnnouncementData, error)
+	DelAnnouncementInfo(ctx context.Context, announcementID int) error
 	Close() error
 }
 

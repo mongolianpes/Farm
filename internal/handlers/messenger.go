@@ -104,7 +104,7 @@ func (h *Handler) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 	var sendMessage SendMessage
 	if err := json.NewDecoder(r.Body).Decode(&sendMessage); err != nil {
-		http.Error(w, "Не удалось разобрать полученный данные", http.StatusBadRequest)
+		http.Error(w, "Не удалось разобрать полученные данные", http.StatusBadRequest)
 		return
 	}
 

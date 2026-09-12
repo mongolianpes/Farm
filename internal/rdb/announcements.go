@@ -102,3 +102,7 @@ func (c *Client) GetAnnouncementInfo(ctx context.Context, announcementID int) (*
 		Images:             images,
 	}, nil
 }
+
+func (c *Client) DelAnnouncementInfo(ctx context.Context, announcementID int) error {
+	return c.rdb.Del(ctx, fmt.Sprintf(redisKeyPrefixAnnouncementInfo, announcementID)).Err()
+}

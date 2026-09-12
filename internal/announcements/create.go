@@ -8,11 +8,12 @@ import (
 
 	pb "project-farm/internal/announcements/proto"
 	imagesService "project-farm/internal/images"
+	"project-farm/internal/rdb"
 )
 
 const maxImagesSize5MB = 5 * 1024 * 1024
 
-func CreateAnnouncement(userID int, title, description, category string, images []*multipart.FileHeader) error {
+func CreateAnnouncement(rdb rdb.DB, userID int, title, description, category string, images []*multipart.FileHeader) error {
 	if err := initService(); err != nil {
 		return errors.New("Попробуйте создать чуть позже")
 	}
@@ -42,7 +43,7 @@ func CreateAnnouncement(userID int, title, description, category string, images 
 	}
 
 	if len(images) >= 1 {
-		if err := sendReqAddImages(images, announcementID, int64(userID)); err != nil {
+		if err := sendReqAddImages(rdb, images, announcementID, int64(userID)); err != nil {
 			slog.Warn("Не удалось создать объявление, поскольку не удалось загрузить картинки", "announcementID", announcementID, "userID", userID, "error", err)
 			return err
 		}
@@ -70,13 +71,13 @@ func sendReqCreateAnnouncement(authorID int64, title, description, category stri
 	return respCreate.AnnouncementID, nil
 }
 
-func sendReqAddImages(images []*multipart.FileHeader, announcementdID, userID int64) error {
+func sendReqAddImages(rdb rdb.DB, images []*multipart.FileHeader, announcementdID, userID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeToCompleteRequest)
 	defer cancel()
 
 	imagesPath, err := saveImages(images)
 	if err != nil {
-		DeleteAnnouncement(int(announcementdID), int(userID))
+		DeleteAnnouncement(rdb, int(announcementdID), int(userID))
 		return err
 	}
 
@@ -85,7 +86,7 @@ func sendReqAddImages(images []*multipart.FileHeader, announcementdID, userID in
 		AnnouncementID: announcementdID,
 	})
 	if err != nil {
-		DeleteAnnouncement(int(announcementdID), int(userID))
+		DeleteAnnouncement(rdb, int(announcementdID), int(userID))
 		return err
 	}
 

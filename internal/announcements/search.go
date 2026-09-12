@@ -58,7 +58,6 @@ func SearchAnnouncements(rdb rdb.DB, offset, userID, authorID int, SearchString,
 	var announcementIDs []interface{}
 	for _, announcement := range resp.AnnouncementsData {
 		result = append(result, &models.AnnouncementData{
-			AuthorName:         announcement.AuthorName,
 			AuthorID:           int(announcement.AuthorID),
 			Title:              announcement.Title,
 			Description:        announcement.Description,
@@ -72,7 +71,7 @@ func SearchAnnouncements(rdb rdb.DB, offset, userID, authorID int, SearchString,
 	}
 
 	if err := rdb.SaveAnnouncementIDsForUser(ctx, announcementIDs, strconv.Itoa(userID)); err != nil {
-		slog.Error("Не удалось сохранить список объявлений в redis")
+		slog.Error("Не удалось сохранить список объявлений в redis", "err", err)
 	} else {
 		for _, announcement := range result {
 			if err := rdb.SaveAnnouncementInfo(ctx, *announcement); err != nil {
@@ -108,7 +107,6 @@ func GetAnnouncementInfo(rdb rdb.DB, announcementID, userID int) (models.Announc
 
 	for _, announcement := range resp.AnnouncementsData {
 		result := models.AnnouncementData{
-			AuthorName:         announcement.AuthorName,
 			AuthorID:           int(announcement.AuthorID),
 			Title:              announcement.Title,
 			Description:        announcement.Description,
